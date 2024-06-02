@@ -34,13 +34,13 @@ Para ejecutar el programa, primero se debe compilar el proyecto con maven. Luego
 Para ejecutar el servidor, se debe correr el siguiente comando:
 
 ```bash
-sh server/src/main/assembly/overlay/run-server.sh
+sh server/src/main/assembly/overlay/run-server.sh 192.168.1.*
 ```
 
 O en windows:
 
 ```bash
-server/src/main/assembly/overlay/run-server.bat
+server/src/main/assembly/overlay/run-server.bat 192.168.1.*
 ```
 
 ### Client
