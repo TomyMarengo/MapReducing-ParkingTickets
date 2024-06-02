@@ -1,9 +1,11 @@
 package ar.edu.itba.pod.client.utils;
 
+import ar.edu.itba.pod.api.models.Infraction;
 import ar.edu.itba.pod.api.models.Ticket;
 import ar.edu.itba.pod.client.exceptions.ClientFileException;
 import ar.edu.itba.pod.client.exceptions.ClientIllegalArgumentException;
 import com.hazelcast.core.IList;
+import com.hazelcast.core.IMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,26 +75,56 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
         }
     }
 
-    public static void parseTicketsCsv(String inPath, String city, IList<Ticket> ticketsList){
-        CsvFileIterator fileIterator = new CsvFileIterator(inPath + "/tickets" + city + ".csv");
+    public static void parseInfractionsCsv(String inPath, String city, IMap<String, Infraction> infractionMap) {
+        CsvFileIterator fileIterator = new CsvFileIterator(inPath + "/infractions" + city + ".csv");
+        CsvMappingConfig config;
+        try {
+            config = CsvMappingConfigFactory.getInfractionConfig(inPath, city);
+        } catch (IOException e) {
+            logger.error("Failed to load CSV mapping configuration for city: " + city, e);
+            return;
+        }
+
         while (fileIterator.hasNext()) {
             String[] fields = fileIterator.next();
-            if (fields.length == Ticket.FIELD_COUNT) {
-                String plate = fields[0];
-                Date issueDate;
-                try {
-                    issueDate = dateFormat.parse(fields[1]);
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-                String infractionCode = fields[2];
-                Double fineAmount = Double.parseDouble(fields[3]);
-                String countyName = fields[4];
-                String issuingAgency = fields[5];
-                ticketsList.add(new Ticket(plate, issueDate, infractionCode, fineAmount, countyName, issuingAgency));
-                System.out.println("Added ticket: " + new Ticket(plate, issueDate, infractionCode, fineAmount, countyName, issuingAgency));
+            if (fields.length == Infraction.FIELD_COUNT) {
+                String code = fields[config.getColumnIndex("code")];
+                String definition = fields[config.getColumnIndex("definition")];
+                infractionMap.put(code, new Infraction(code, definition));
+            } else {
+                logger.error(String.format("Invalid line format, expected %d fields, found %d", Infraction.FIELD_COUNT, fields.length));
             }
-            else {
+        }
+        fileIterator.close();
+    }
+
+
+    public static void parseTicketsCsv(String inPath, String city, IList<Ticket> ticketsList){
+        CsvFileIterator fileIterator = new CsvFileIterator(inPath + "/tickets" + city + ".csv");
+        CsvMappingConfig config;
+        try {
+            config = CsvMappingConfigFactory.getTicketConfig(inPath, city);
+        } catch (IOException e) {
+            logger.error("Failed to load CSV mapping configuration for city: " + city, e);
+            return;
+        }
+
+        while (fileIterator.hasNext()) {
+            String[] fields = fileIterator.next();
+            if (fields.length >= Ticket.FIELD_COUNT) {
+                try {
+                    String plate = fields[config.getColumnIndex("plate")];
+                    Date issueDate = dateFormat.parse(fields[config.getColumnIndex("issueDate")]);
+                    String infractionCode = fields[config.getColumnIndex("infractionCode")];
+                    Double fineAmount = Double.parseDouble(fields[config.getColumnIndex("fineAmount")]);
+                    String countyName = fields[config.getColumnIndex("countyName")];
+                    String issuingAgency = fields[config.getColumnIndex("issuingAgency")];
+
+                    ticketsList.add(new Ticket(plate, issueDate, infractionCode, fineAmount, countyName, issuingAgency));
+                } catch (ParseException e) {
+                    logger.error("Error parsing date", e);
+                }
+            } else {
                 logger.error(String.format("Invalid line format, expected %d fields, found %d", Ticket.FIELD_COUNT, fields.length));
             }
         }

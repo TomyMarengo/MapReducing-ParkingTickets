@@ -1,5 +1,6 @@
 package ar.edu.itba.pod.client;
 
+import ar.edu.itba.pod.api.models.Infraction;
 import ar.edu.itba.pod.api.models.Ticket;
 import ar.edu.itba.pod.client.utils.Arguments;
 import ar.edu.itba.pod.client.utils.CsvFileIterator;
@@ -10,11 +11,9 @@ import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.config.GroupConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IList;
+import com.hazelcast.core.IMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
-import java.util.List;
 
 public class Client {
     private static Logger logger = LoggerFactory.getLogger(Client.class);
@@ -36,13 +35,30 @@ public class Client {
         clientConfig.setNetworkConfig(clientNetworkConfig);
 
         HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
-        String listName = "tickets";
+        String ticketsName = "tickets";
+        String infractionsName = "infractions";
+        IList<Ticket> tickets = hazelcastInstance.getList(ticketsName);
+        IMap<String, Infraction> infractions = hazelcastInstance.getMap(infractionsName);
+
+        //TODO: Time this
+        System.out.println("Loading infractions from " + arguments.getInPath() + " for city " + arguments.getCity());
+        CsvFileIterator.parseInfractionsCsv(arguments.getInPath(), arguments.getCity(), infractions);
+        System.out.println("Infractions loaded: " + infractions.size());
+
+        //TODO: Time this
         System.out.println("Loading tickets from " + arguments.getInPath() + " for city " + arguments.getCity());
-        IList<Ticket> tickets = hazelcastInstance.getList(listName);
         CsvFileIterator.parseTicketsCsv(arguments.getInPath(), arguments.getCity(), tickets);
-        for (Object o : hazelcastInstance.getList(listName)) {
-            Ticket ticket = (Ticket) o;
+        System.out.println("Tickets loaded: " + tickets.size());
+
+        //PRINT TICKETS & INFRACTIONS
+        System.out.println("Tickets:");
+        for (Ticket ticket : tickets) {
             System.out.println(ticket);
+        }
+
+        System.out.println("Infractions:");
+        for (String key : infractions.keySet()) {
+            System.out.println(infractions.get(key));
         }
 
         HazelcastClient.shutdownAll();

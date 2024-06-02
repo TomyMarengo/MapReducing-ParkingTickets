@@ -23,6 +23,7 @@
 hs_err_pid*
 replay_pid*
 
+# Common IDE-Java files
 *.class
 *.exe
 *.lst
@@ -30,4 +31,13 @@ replay_pid*
 */target
 .vscode
 out/
-*.csv
+
+# Test files
+resources/infractionsCHI.csv
+resources/infractionsCHI.json
+resources/ticketsCHI.csv
+resources/ticketsCHI.json
+resources/infractionsNYC.csv
+resources/infractionsNYC.json
+resources/ticketsNYC.csv
+resources/ticketsNYC.json
