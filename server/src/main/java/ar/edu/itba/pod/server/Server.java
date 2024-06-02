@@ -11,14 +11,14 @@ public class Server {
 
     public static void main(String[] args) {
 
-        /*if(args.length == 0) {
+        if(args.length == 0) {
             logger.error("Attempted to initialize Hazelcast server without selecting a network interface");
             throw new IllegalArgumentException("No network interface provided");
         }
 
         String networkInterface = args[0];
         logger.info("Network interface: " + networkInterface);
-        logger.info("Setting up server");*/
+        logger.info("Setting up server");
 
         // Config
         Config config = new Config();
@@ -37,7 +37,7 @@ public class Server {
 
         // Interfaces config
         InterfacesConfig interfacesConfig = new InterfacesConfig()
-                .setInterfaces(Collections.singletonList("192.168.1.*"))
+                .setInterfaces(Collections.singletonList(networkInterface))
                 .setEnabled(true);
 
         NetworkConfig networkConfig = new NetworkConfig()
