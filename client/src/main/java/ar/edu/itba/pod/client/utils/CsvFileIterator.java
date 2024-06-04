@@ -18,7 +18,7 @@ import java.util.Iterator;
 public class CsvFileIterator implements Iterator<String[]>, Closeable {
     private final BufferedReader reader;
     private String currentLine;
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat infractionsDateFormat = new SimpleDateFormat(Constants.INFRACTIONS_DATE_FORMAT);
     private static final Logger logger = LoggerFactory.getLogger(CsvFileIterator.class);
 
     public CsvFileIterator(String filename) {
@@ -114,7 +114,7 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
             if (fields.length >= Ticket.FIELD_COUNT) {
                 try {
                     String plate = fields[config.getColumnIndex("plate")];
-                    Date issueDate = dateFormat.parse(fields[config.getColumnIndex("issueDate")]);
+                    Date issueDate = infractionsDateFormat.parse(fields[config.getColumnIndex("issueDate")]);
                     String infractionCode = fields[config.getColumnIndex("infractionCode")];
                     Double fineAmount = Double.parseDouble(fields[config.getColumnIndex("fineAmount")]);
                     String countyName = fields[config.getColumnIndex("countyName")];

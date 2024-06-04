@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.function.BiConsumer;
 public class ArgumentParser {
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.ARGUMENTS_DATE_FORMAT);
 
     private static final Map<String, BiConsumer<String, Arguments.Builder>> OPTIONS = Map.ofEntries(
             Map.entry("-Dquery", (argValue, argBuilder) -> argBuilder.query(Integer.parseInt(argValue))),
