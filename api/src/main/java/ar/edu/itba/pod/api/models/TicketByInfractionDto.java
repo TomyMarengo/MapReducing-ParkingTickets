@@ -6,7 +6,7 @@ import com.hazelcast.nio.serialization.DataSerializable;
 
 import java.io.IOException;
 
-public class TicketByInfractionDto implements Comparable<TicketByInfractionDto>, DataSerializable {
+public class TicketByInfractionDto implements Comparable<TicketByInfractionDto>, DataSerializable, CsvWritable {
     private String infractionCode;
     private int count;
 
@@ -47,5 +47,10 @@ public class TicketByInfractionDto implements Comparable<TicketByInfractionDto>,
     @Override
     public String toString() {
         return infractionCode + "; " + count;
+    }
+
+    @Override
+    public String toCsv() {
+        return infractionCode + ";" + count;
     }
 }

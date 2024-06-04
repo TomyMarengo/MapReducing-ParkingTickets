@@ -14,6 +14,8 @@ import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 import com.hazelcast.core.ICompletableFuture;
+
+import java.io.FileWriter;
 import java.util.*;
 
 @SuppressWarnings("deprecation")
@@ -24,9 +26,7 @@ public class TotalTicketsByInfractionQuery extends Query {
         IList<Ticket> tickets = hazelcastInstance.getList(Constants.TICKETS_LIST);
         IMap<String, Infraction> infractions = hazelcastInstance.getMap(Constants.INFRACTIONS_MAP);
 
-        System.out.println("Loading infractions from " + arguments.getInPath() + " for city " + arguments.getCity());
         CsvFileIterator.parseInfractionsCsv(arguments.getInPath(), arguments.getCity(), infractions);
-        System.out.println("Loading tickets from " + arguments.getInPath() + " for city " + arguments.getCity());
         CsvFileIterator.parseTicketsCsv(arguments.getInPath(), arguments.getCity(), tickets);
     }
 
@@ -45,10 +45,7 @@ public class TotalTicketsByInfractionQuery extends Query {
 
         try {
             TreeSet<TicketByInfractionDto> result = future.get();
-            System.out.println("Infraction Code\tTotal Tickets");
-            for (TicketByInfractionDto dto : result) {
-                System.out.println(dto.getInfractionCode() + "\t" + dto.getCount());
-            }
+            writeData("infraction code;total tickets", result);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,7 +1,8 @@
 package ar.edu.itba.pod.client.utils;
 
 public class Constants {
-    public static final String TIMESTAMP_LOGS_FILE = "/timestamps-logs.txt";
+    public static final String TIMESTAMP_LOGS_FILE_TEMPLATE = "/time%d.txt";
+    public static final String QUERY_OUTPUT_FILE_TEMPLATE = "/query%d.csv";
     public static final String TIMESTAMP_LOGS_DATE_FORMAT = "dd/MM/yyyy HH:mm:ss:SSS";
     public static final String INFRACTIONS_DATE_FORMAT = "yyyy-MM-dd";
     public static final String ARGUMENTS_DATE_FORMAT = "dd/MM/yyyy";
