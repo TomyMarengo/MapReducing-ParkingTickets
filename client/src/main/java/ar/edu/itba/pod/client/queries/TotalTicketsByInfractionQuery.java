@@ -6,14 +6,14 @@ import ar.edu.itba.pod.api.models.Infraction;
 import ar.edu.itba.pod.api.models.TicketByInfractionDto;
 import ar.edu.itba.pod.api.reducers.TotalTicketsByInfractionReducerFactory;
 import ar.edu.itba.pod.api.submitters.TotalTicketsByInfractionSubmitter;
-import ar.edu.itba.pod.client.utils.Constants;
-import ar.edu.itba.pod.client.utils.CsvFileIterator;
-import com.hazelcast.core.IList;
+import ar.edu.itba.pod.client.utils.*;
 import com.hazelcast.core.IMap;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 import com.hazelcast.core.ICompletableFuture;
+
+import java.text.ParseException;
 import java.util.*;
 
 @SuppressWarnings("deprecation")
@@ -22,22 +22,43 @@ public class TotalTicketsByInfractionQuery extends Query {
 
     @Override
     protected void loadData() {
-        IList<Ticket> tickets = hazelcastInstance.getList(Constants.TICKETS_LIST);
         IMap<String, Infraction> infractions = hazelcastInstance.getMap(Constants.INFRACTIONS_MAP);
+        IMap<String, Integer> ticketsCount = hazelcastInstance.getMap(Constants.TICKETS_BY_INFRACTION_MAP);
 
-        //TODO: Parse here the CSV Files because maybe it depends by the query
-        //TODO: CsvFileIterator could have a generic readCsv method that reads the file using a lambda/consumer
-        CsvFileIterator.parseInfractionsCsv(arguments.getInPath(), arguments.getCity(), infractions);
-        CsvFileIterator.parseTicketsCsv(arguments.getInPath(), arguments.getCity(), tickets);
+        // Parse infractions CSV
+        CsvFileIterator.readCsv(arguments, CsvFileType.INFRACTIONS, (fields, config) -> {
+            if (fields.length == Infraction.FIELD_COUNT) {
+                String code = fields[config.getColumnIndex("code")];
+                String definition = fields[config.getColumnIndex("definition")];
+                infractions.put(code, new Infraction(code, definition));
+            } else {
+                logger.error(String.format("Invalid line format, expected %d fields, found %d", Infraction.FIELD_COUNT, fields.length));
+            }
+        });
+
+        // Parse tickets CSV and count infractions
+        CsvFileIterator.readCsv(arguments, CsvFileType.TICKETS, (fields, config) -> {
+            if (fields.length >= Ticket.FIELD_COUNT) {
+                try {
+                    String infractionCode = fields[config.getColumnIndex("infractionCode")];
+                    String definition = infractions.get(infractionCode).getDefinition();
+                    ticketsCount.merge(definition, 1, Integer::sum);
+                } catch (Exception e) {
+                    logger.error("Error processing ticket data", e);
+                }
+            } else {
+                logger.error(String.format("Invalid line format, expected %d fields, found %d", Ticket.FIELD_COUNT, fields.length));
+            }
+        });
     }
 
     @Override
     protected void executeJob() {
-        IList<Ticket> tickets = hazelcastInstance.getList(Constants.TICKETS_LIST);
+        IMap<String, Integer> ticketsCount = hazelcastInstance.getMap(Constants.TICKETS_BY_INFRACTION_MAP);
 
         JobTracker jobTracker = hazelcastInstance.getJobTracker(Constants.QUERY_1_JOB_TRACKER_NAME);
-        KeyValueSource<String, Ticket> source = KeyValueSource.fromList(tickets);
-        Job<String, Ticket> job = jobTracker.newJob(source);
+        KeyValueSource<String, Integer> source = KeyValueSource.fromMap(ticketsCount);
+        Job<String, Integer> job = jobTracker.newJob(source);
 
         final ICompletableFuture<TreeSet<TicketByInfractionDto>> future = job
                 .mapper(new TotalTicketsByInfractionMapper())

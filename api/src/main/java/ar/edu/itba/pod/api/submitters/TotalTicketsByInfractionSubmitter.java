@@ -15,6 +15,4 @@ public class TotalTicketsByInfractionSubmitter implements Collator<Map.Entry<Str
         }
         return resultSet;
     }
-
-    //TODO: Check infractions with 0 tickets, are they showing up?
 }

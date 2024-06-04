@@ -17,7 +17,7 @@ import java.util.Date;
 public abstract class Query {
     protected HazelcastInstance hazelcastInstance;
     protected Arguments arguments;
-    private static final Logger logger = LoggerFactory.getLogger(Client.class);
+    protected static final Logger logger = LoggerFactory.getLogger(Client.class);
     private static final SimpleDateFormat sdf = new SimpleDateFormat(Constants.TIMESTAMP_LOGS_DATE_FORMAT);
     String timestampLogFilePath;
     String queryOutputFilePath;

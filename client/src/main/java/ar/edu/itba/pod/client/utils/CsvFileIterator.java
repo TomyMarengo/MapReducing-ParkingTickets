@@ -14,11 +14,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.function.BiConsumer;
 
 public class CsvFileIterator implements Iterator<String[]>, Closeable {
     private final BufferedReader reader;
     private String currentLine;
-    private static final SimpleDateFormat infractionsDateFormat = new SimpleDateFormat(Constants.INFRACTIONS_DATE_FORMAT);
     private static final Logger logger = LoggerFactory.getLogger(CsvFileIterator.class);
 
     public CsvFileIterator(String filename) {
@@ -75,59 +75,31 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
         }
     }
 
-    public static void parseInfractionsCsv(String inPath, String city, IMap<String, Infraction> infractionMap) {
-        CsvFileIterator fileIterator = new CsvFileIterator(inPath + "/infractions" + city + ".csv");
+    //TODO: read with threads
+    public static void readCsv(Arguments arguments, CsvFileType fileType, BiConsumer<String[], CsvMappingConfig> consumer) {
         CsvMappingConfig config;
+        String filename;
+
         try {
-            config = CsvMappingConfigFactory.getInfractionConfig(inPath, city);
-        } catch (IOException e) {
-            logger.error("Failed to load CSV mapping configuration for city: " + city, e);
-            return;
-        }
-
-        while (fileIterator.hasNext()) {
-            String[] fields = fileIterator.next();
-            if (fields.length == Infraction.FIELD_COUNT) {
-                String code = fields[config.getColumnIndex("code")];
-                String definition = fields[config.getColumnIndex("definition")];
-                infractionMap.put(code, new Infraction(code, definition));
-            } else {
-                logger.error(String.format("Invalid line format, expected %d fields, found %d", Infraction.FIELD_COUNT, fields.length));
-            }
-        }
-        fileIterator.close();
-    }
-
-
-    public static void parseTicketsCsv(String inPath, String city, IList<Ticket> ticketsList){
-        CsvFileIterator fileIterator = new CsvFileIterator(inPath + "/tickets" + city + ".csv");
-        CsvMappingConfig config;
-        try {
-            config = CsvMappingConfigFactory.getTicketConfig(inPath, city);
-        } catch (IOException e) {
-            logger.error("Failed to load CSV mapping configuration for city: " + city, e);
-            return;
-        }
-
-        while (fileIterator.hasNext()) {
-            String[] fields = fileIterator.next();
-            if (fields.length >= Ticket.FIELD_COUNT) {
-                try {
-                    String plate = fields[config.getColumnIndex("plate")];
-                    Date issueDate = infractionsDateFormat.parse(fields[config.getColumnIndex("issueDate")]);
-                    String infractionCode = fields[config.getColumnIndex("infractionCode")];
-                    Double fineAmount = Double.parseDouble(fields[config.getColumnIndex("fineAmount")]);
-                    String countyName = fields[config.getColumnIndex("countyName")];
-                    String issuingAgency = fields[config.getColumnIndex("issuingAgency")];
-
-                    ticketsList.add(new Ticket(plate, issueDate, infractionCode, fineAmount, countyName, issuingAgency));
-                } catch (ParseException e) {
-                    logger.error("Error parsing date", e);
+            filename = switch (fileType) {
+                case TICKETS -> {
+                    config = CsvMappingConfigFactory.getTicketConfig(arguments.getInPath(), arguments.getCity());
+                    yield arguments.getInPath() + "/tickets" + arguments.getCity() + ".csv";
                 }
-            } else {
-                logger.error(String.format("Invalid line format, expected %d fields, found %d", Ticket.FIELD_COUNT, fields.length));
+                case INFRACTIONS -> {
+                    config = CsvMappingConfigFactory.getInfractionConfig(arguments.getInPath(), arguments.getCity());
+                    yield arguments.getInPath() + "/infractions" + arguments.getCity() + ".csv";
+                }
+                default -> throw new IllegalArgumentException("Unsupported CSV file type");
+            };
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load CSV mapping configuration for city: " + arguments.getCity(), e);
+        }
+
+        try (CsvFileIterator fileIterator = new CsvFileIterator(filename)) {
+            while (fileIterator.hasNext()) {
+                consumer.accept(fileIterator.next(), config);
             }
         }
-        fileIterator.close();
     }
 }
