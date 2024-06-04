@@ -10,14 +10,25 @@ public class Server {
     private static Logger logger = LoggerFactory.getLogger(Server.class);
 
     public static void main(String[] args) {
+        String networkInterface = null;
 
-        if(args.length == 0) {
-            logger.error("Attempted to initialize Hazelcast server without selecting a network interface");
+        // Busca el parámetro -Daddress en los argumentos
+        for (String arg : args) {
+            if (arg.startsWith("-Daddress=")) {
+                networkInterface = arg.substring("-Daddress=".length());
+                break;
+            }
+        }
+
+        // Verifica si se proporcionó la interfaz de red
+        if (networkInterface == null) {
+            logger.error("No network interface provided. Use -Daddress=\"...\"");
             throw new IllegalArgumentException("No network interface provided");
         }
 
-        String networkInterface = args[0];
-        logger.info("Network interface: " + networkInterface);
+        System.out.println(networkInterface);
+
+        logger.info("Network interface: {}", networkInterface);
         logger.info("Setting up server");
 
         // Config

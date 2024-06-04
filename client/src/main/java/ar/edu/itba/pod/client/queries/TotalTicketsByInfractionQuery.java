@@ -18,12 +18,15 @@ import java.util.*;
 
 @SuppressWarnings("deprecation")
 public class TotalTicketsByInfractionQuery extends Query {
+    private static final String HEADER = "Infraction,Total Tickets";
 
     @Override
     protected void loadData() {
         IList<Ticket> tickets = hazelcastInstance.getList(Constants.TICKETS_LIST);
         IMap<String, Infraction> infractions = hazelcastInstance.getMap(Constants.INFRACTIONS_MAP);
 
+        //TODO: Parse here the CSV Files because maybe it depends by the query
+        //TODO: CsvFileIterator could have a generic readCsv method that reads the file using a lambda/consumer
         CsvFileIterator.parseInfractionsCsv(arguments.getInPath(), arguments.getCity(), infractions);
         CsvFileIterator.parseTicketsCsv(arguments.getInPath(), arguments.getCity(), tickets);
     }
@@ -43,7 +46,7 @@ public class TotalTicketsByInfractionQuery extends Query {
 
         try {
             TreeSet<TicketByInfractionDto> result = future.get();
-            writeData("infraction code;total tickets", result);
+            writeData(HEADER, result);
         } catch (Exception e) {
             e.printStackTrace();
         }

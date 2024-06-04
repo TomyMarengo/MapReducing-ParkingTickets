@@ -6,11 +6,12 @@ MapReduce con Hazelcast en Java. Proporciona respuesta a consultas predefinidas 
 - [Requisitos](#requisitos)
 - [Instalación](#instalación)
 - [Uso](#uso)
-- [Ejemplos](#ejemplos)
+  - [Ejemplos de Uso](#ejemplos-de-uso)
 - [Licencia](#licencia)
 
 # Requisitos
-Se requiere Java >=17.0.0 y Apache Maven >=3.5.0.
+* Java >= 20.0.0
+* Apache Maven >= 3.9.4.
 
 # Instalación
 
@@ -28,36 +29,46 @@ mvn clean install
 
 # Uso
 
-Para ejecutar el programa, primero se debe compilar el proyecto con maven. Luego, se debe ejecutar el servidor y los clientes.
+### Ejecución del Servidor
+Para ejecutar el servidor, sigue estos pasos:
 
-### Server
-Para ejecutar el servidor, se debe correr el siguiente comando:
+1. Abre una terminal.
+2. Ubicate en la carpeta padre del proyecto.
+3. Ejecuta el script run-server con el siguiente comando:
 
 ```bash
-sh server/src/main/assembly/overlay/run-server.sh 192.168.1.*
+sh server/src/main/assembly/overlay/run-server.sh #[opciones]
 ```
 
 O en windows:
 
 ```bash
-server/src/main/assembly/overlay/run-server.bat 192.168.1.*
+server/src/main/assembly/overlay/run-server.bat #[opciones]
 ```
 
-### Client
+* **[opciones]**: Puedes proporcionar opciones adicionales según sea necesario. Consulta el archivo [EJEMPLOS.md](EJEMPLOS.md) para ver ejemplos de uso.
 
-Para ejecutar un cliente, se debe correr el siguiente comando:
+### Ejecución del Cliente
+
+Para ejecutar el cliente, sigue estos pasos:
+
+1. Abre una terminal.
+2. Ubicate en la carpeta padre del proyecto.
+3. Ejecuta el script de alguna query (N) con el siguiente comando:
 
 ```bash
-sh client/src/main/assembly/overlay/run-client.sh
+sh client/src/main/assembly/overlay/queryN.sh #[opciones]
 ```
 
 O en windows:
 
 ```bash
-client/src/main/assembly/overlay/run-client.bat
+client/src/main/assembly/overlay/queryN.bat #[opciones]
 ```
 
-# Ejemplos
+* **[opciones]**: Puedes proporcionar opciones adicionales según sea necesario. Consulta el archivo [EJEMPLOS.md](EJEMPLOS.md) para ver ejemplos de uso.
+
+## Ejemplos de Uso
 
 Para ver ejemplos de uso, consulte el archivo [EJEMPLOS.md](EJEMPLOS.md).
 
