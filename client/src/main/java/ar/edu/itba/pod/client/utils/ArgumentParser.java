@@ -7,10 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.BiConsumer;
-public class Parser {
+public class ArgumentParser {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     private static final Map<String, BiConsumer<String, Arguments.Builder>> OPTIONS = Map.ofEntries(
+            Map.entry("-Dquery", (argValue, argBuilder) -> argBuilder.query(Integer.parseInt(argValue))),
             Map.entry("-Daddresses", (argValue, argBuilder) ->  argBuilder.addresses(argValue.split(";"))),
             Map.entry("-DinPath", (argValue, argBuilder) -> argBuilder.inPath(argValue)),
             Map.entry("-DoutPath", (argValue, argBuilder) -> argBuilder.outPath(argValue)),
@@ -46,7 +47,7 @@ public class Parser {
                 throw new ClientIllegalArgumentException("Arguments must have the format -Dargument=value");
             }
             try {
-                OPTIONS.getOrDefault(parts[0], Parser::invalidArgument).accept(parts[1], arguments);
+                OPTIONS.getOrDefault(parts[0], ArgumentParser::invalidArgument).accept(parts[1], arguments);
             } catch (Exception e) {
                 throw new ClientIllegalArgumentException(e.getMessage());
             }

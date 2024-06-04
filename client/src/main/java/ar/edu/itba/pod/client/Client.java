@@ -2,9 +2,10 @@ package ar.edu.itba.pod.client;
 
 import ar.edu.itba.pod.api.models.Infraction;
 import ar.edu.itba.pod.api.models.Ticket;
+import ar.edu.itba.pod.client.queries.TotalTicketsByInfractionQuery;
 import ar.edu.itba.pod.client.utils.Arguments;
 import ar.edu.itba.pod.client.utils.CsvFileIterator;
-import ar.edu.itba.pod.client.utils.Parser;
+import ar.edu.itba.pod.client.utils.ArgumentParser;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
@@ -23,7 +24,7 @@ public class Client {
         // Client Config
         ClientConfig clientConfig = new ClientConfig();
 
-        Arguments arguments = Parser.parse(args);
+        Arguments arguments = ArgumentParser.parse(args);
 
         // Group Config
         GroupConfig groupConfig = new GroupConfig().setName("g2").setPassword("g2-pass");
@@ -43,22 +44,21 @@ public class Client {
         //TODO: Time this
         System.out.println("Loading infractions from " + arguments.getInPath() + " for city " + arguments.getCity());
         CsvFileIterator.parseInfractionsCsv(arguments.getInPath(), arguments.getCity(), infractions);
-        System.out.println("Infractions loaded: " + infractions.size());
+        System.out.println("New infractions size: " + infractions.size());
 
         //TODO: Time this
         System.out.println("Loading tickets from " + arguments.getInPath() + " for city " + arguments.getCity());
         CsvFileIterator.parseTicketsCsv(arguments.getInPath(), arguments.getCity(), tickets);
-        System.out.println("Tickets loaded: " + tickets.size());
+        System.out.println("New tickets size: " + tickets.size());
 
-        //PRINT TICKETS & INFRACTIONS
-        System.out.println("Tickets:");
-        for (Ticket ticket : tickets) {
-            System.out.println(ticket);
-        }
+        // Ejecutar la query según el argumento
+        switch (arguments.getQuery()) {
+            case 1:
+                new TotalTicketsByInfractionQuery().execute(hazelcastInstance, arguments.getOutPath());
+                break;
 
-        System.out.println("Infractions:");
-        for (String key : infractions.keySet()) {
-            System.out.println(infractions.get(key));
+            default:
+                logger.error("Unknown query: " + arguments.getQuery());
         }
 
         HazelcastClient.shutdownAll();

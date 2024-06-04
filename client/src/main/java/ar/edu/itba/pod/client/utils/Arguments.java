@@ -2,9 +2,11 @@ package ar.edu.itba.pod.client.utils;
 
 import ar.edu.itba.pod.client.exceptions.ClientIllegalArgumentException;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class Arguments {
+    private final Integer query;
     private final String[] addresses;
     private final String inPath;
     private final String outPath;
@@ -15,6 +17,7 @@ public class Arguments {
 
 
     private Arguments(Builder builder) {
+        this.query = builder.query;
         this.addresses = builder.addresses;
         this.inPath = builder.inPath;
         this.outPath = builder.outPath;
@@ -23,9 +26,13 @@ public class Arguments {
         this.from = builder.from;
         this.to = builder.to;
 
-        if (addresses == null || addresses.length == 0 || inPath == null || outPath == null) {
+        if (query == null || addresses == null || addresses.length == 0 || inPath == null || outPath == null) {
             throw new ClientIllegalArgumentException("Parameters -Daddresses, -DinPath and -DoutPath must be provided");
         }
+    }
+
+    public Integer getQuery() {
+        return query;
     }
 
     public String[] getAddresses() {
@@ -59,7 +66,8 @@ public class Arguments {
     @Override
     public String toString() {
         return "Arguments{" +
-                "addresses=" + addresses +
+                "query=" + query +
+                "addresses=" + Arrays.toString(addresses) +
                 ", inPath='" + inPath + '\'' +
                 ", outPath='" + outPath + '\'' +
                 ", city='" + city + '\'' +
@@ -70,6 +78,7 @@ public class Arguments {
     }
 
     public static class Builder {
+        private Integer query;
         private String[] addresses;
         private String inPath;
         private String outPath;
@@ -77,6 +86,11 @@ public class Arguments {
         private Integer n;
         private Date from;
         private Date to;
+
+        public Builder query(Integer query) {
+            this.query = query;
+            return this;
+        }
 
         public Builder addresses(String[] addresses) {
             this.addresses = addresses;
