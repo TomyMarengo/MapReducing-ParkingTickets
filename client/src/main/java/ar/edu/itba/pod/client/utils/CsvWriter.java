@@ -1,6 +1,7 @@
 package ar.edu.itba.pod.client.utils;
 
 import ar.edu.itba.pod.api.models.CsvWritable;
+import ar.edu.itba.pod.client.exceptions.ClientFileException;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -16,6 +17,9 @@ public class CsvWriter {
                 writer.write(record.toCsv());
                 writer.newLine();
             }
+        }
+        catch (IOException e) {
+            throw new ClientFileException("Error writing CSV file", e);
         }
     }
 }

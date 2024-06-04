@@ -14,8 +14,6 @@ import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 import com.hazelcast.core.ICompletableFuture;
-
-import java.io.FileWriter;
 import java.util.*;
 
 @SuppressWarnings("deprecation")
