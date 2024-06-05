@@ -24,11 +24,12 @@ docker run -d -p 8080:8080 --name tomcat-jre8 -v $(pwd)/tomcat-webapps:/usr/loca
 4. Copia el archivo WAR descargado en el directorio `tomcat-webapps` que se creó en el paso anterior.
 
 ```bash
-mkdir tomcat-webapps
 cp path/to/mancenter-3.8.5.war tomcat-webapps/
 ```
 
-5. Accede a la URL de Management Center en tu navegador web: [http://localhost:8080/management-center-3.8.5](http://localhost:8080/mancenter-3.8.5)
+5. Accede a la URL de Management Center en tu navegador web: [http://localhost:8080/mancenter-3.8.5](http://localhost:8080/mancenter-3.8.5)
+
+   <u>Aclaración:</u> es probable que se necesite reinciar el contenedor.
 
 
 6. Cree un usuario y contraseña para acceder a Management Center.
