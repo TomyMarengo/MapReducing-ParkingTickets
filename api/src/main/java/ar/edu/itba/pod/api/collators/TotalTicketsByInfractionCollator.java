@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.api.submitters;
+package ar.edu.itba.pod.api.collators;
 
 import ar.edu.itba.pod.api.models.TicketByInfractionDto;
 import com.hazelcast.mapreduce.Collator;
@@ -6,7 +6,7 @@ import com.hazelcast.mapreduce.Collator;
 import java.util.*;
 
 @SuppressWarnings("deprecation")
-public class TotalTicketsByInfractionSubmitter implements Collator<Map.Entry<String, Integer>, TreeSet<TicketByInfractionDto>> {
+public class TotalTicketsByInfractionCollator implements Collator<Map.Entry<String, Integer>, TreeSet<TicketByInfractionDto>> {
     @Override
     public TreeSet<TicketByInfractionDto> collate(Iterable<Map.Entry<String, Integer>> values) {
         TreeSet<TicketByInfractionDto> resultSet = new TreeSet<>();

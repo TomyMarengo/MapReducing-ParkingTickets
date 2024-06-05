@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public class CsvWriter {
     public static <T extends CsvWritable> void writeCsv(String filePath, String header, Collection<T> data) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, false))) {
             writer.write(header);
             writer.newLine();
             for (T record : data) {

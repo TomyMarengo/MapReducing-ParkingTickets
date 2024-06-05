@@ -1,0 +1,71 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{caption}
+\usepackage{amsfonts, amsmath, amssymb, enumitem, authblk, times, framed, varwidth, graphicx, placeins, indentfirst, pdfpages, fancyhdr, titling, listings} 
+\usepackage{float}
+\usepackage[justification=centering]{caption}
+\setlength{\textwidth}{180mm}
+\setlength{\textheight}{250mm}
+\setlength{\oddsidemargin}{-10mm}
+\setlength{\evensidemargin}{15mm}
+\setlength{\topmargin}{-10mm}
+
+\renewcommand{\baselinestretch}{1.4}
+\renewcommand{\headrulewidth}{0.5pt}
+
+\lhead{\begin{picture}(0,0) \put(0,0){\includegraphics[width=20mm]{./LogoITBA}} \end{picture}}
+\renewcommand{\headrulewidth}{0.5pt}
+
+\def\FIG#1#2{%
+	{\centering#1\par}
+	#2}
+
+\pagestyle{fancy}
+
+\begin{document}
+	
+	\begin{titlepage}
+		\centering
+			{\includegraphics[width=0.50\textwidth]{LogoITBA}\par}
+			{\bfseries\LARGE Instituto Tecnol\'ogico de Buenos Aires \par}
+			\vspace{2cm}
+			{\scshape\Huge MapReducing Parking Tickets \par}
+			\vspace{0.5cm}
+			{\itshape\Large 72.42 Programación Orientada a Objetos - 2024Q1 \par}
+			\vspace{1cm}
+			
+			{\Large \textbf{\underline{Alumnos:}} \par}
+			{\Large \large \textbf{Tomás Santiago Marengo}, 61587 \par}
+			{\Large \large \textbf{Abril Occhipinti}, 61159 \par}	
+			{\Large \large \textbf{Santino Ranucci}, 62092 \par}	
+			{\Large \large \textbf{Agustin Zakalik}, 62068 \par}	
+			
+			\vspace{1cm}
+			
+			{\Large \textbf{\underline{Profesores:}} \par}
+			{\Large \large \textbf{Ing. Marcelo Turrín} \par}
+			{\Large \large \textbf{Ing. Franco Román Meola} \par}		
+			
+			\vfill
+	\end{titlepage}
+	
+	\newpage
+	\tableofcontents
+	\newpage
+	
+	\section{Introducción}
+	
+	\begin{itemize}
+		\item Cómo se diseñaron los componentes de cada trabajo MapReduce, qué decisiones se tomaron y con qué objetivos. Además alguna alternativa de diseño que se evaluó y descartó, comentando el porqué.
+		\item El análisis de los tiempos para la resolución de cada query: En caso de poder, analizar la diferencia de tiempos de correr cada query aumentando la cantidad de nodos (hasta 5 nodos) en una red local. De no poder, intentar predecir cómo sería el comportamiento.
+		\item Potenciales puntos de mejora y/o expansión.
+		\item La comparación de los tiempos de las queries ejecutándose con y sin Combiner.
+		\item Otro análisis de tiempos de ejecución de las queries utilizando algún otro elemento de optimización a elección por el grupo.
+		\item Para todos los puntos anteriores, no olvidar de indicar el tamaño de los archivos utilizados como entrada para las pruebas (cantidad de registros).
+	\end{itemize}
+	
+	
+\end{document}

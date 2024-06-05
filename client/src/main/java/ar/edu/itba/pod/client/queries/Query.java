@@ -56,7 +56,7 @@ public abstract class Query {
 
     private void logAndWrite(String message, String filePath) {
         logger.info(message.trim());
-        try (FileWriter writer = new FileWriter(filePath, true)) {
+        try (FileWriter writer = new FileWriter(filePath, false)) {
             writer.write(message);
         } catch (IOException e) {
             e.printStackTrace();
