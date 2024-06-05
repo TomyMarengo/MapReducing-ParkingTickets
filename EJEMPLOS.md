@@ -78,7 +78,7 @@ sh client/src/main/assembly/overlay/query2.sh -Daddresses="192.168.1.51:5701" -D
 
 ### Query 3: Top N agencias con mayor porcentaje de recaudación
 
-Utilizando un nodo, el dataset de CHI y N=4:
+Utilizando un nodo, el dataset de CHI y n=4:
 ```bash
 sh client/src/main/assembly/overlay/query3.sh -Daddresses="192.168.1.51:5701" -Dcity=CHI -Dn=4 -DinPath=./resources -DoutPath=./resources/out
 ```

@@ -5,8 +5,9 @@ MapReduce con Hazelcast en Java. Proporciona respuesta a consultas predefinidas 
 
 - [Requisitos](#requisitos)
 - [Instalación](#instalación)
-- [Uso](#uso)
-  - [Ejemplos de Uso](#ejemplos-de-uso)
+- [Funcionamiento General](#funcionamiento-general)
+- [Ejemplos de Uso](#ejemplos-de-uso)
+- [Management Center](#management-center)
 - [Licencia](#licencia)
 
 # Requisitos
@@ -27,9 +28,11 @@ Luego, compila el programa con el siguiente comando maven:
 mvn clean install
 ```
 
-# Uso
+# Funcionamiento General
 
-### Ejecución del Servidor
+MapReducing-ParkingTickets utiliza Hazelcast para ejecutar consultas MapReduce sobre conjuntos de datos de multas de estacionamiento. Para ello es necesario ejecutar por lo menos un servidor que actuará como nodo y un cliente que enviará las consultas.
+
+## Ejecución del Servidor
 Para ejecutar el servidor, sigue estos pasos:
 
 1. Abre una terminal.
@@ -40,15 +43,12 @@ Para ejecutar el servidor, sigue estos pasos:
 sh server/src/main/assembly/overlay/run-server.sh #[opciones]
 ```
 
-O en windows:
+### **[opciones]**:
+* **-Daddress** = Network Interface Address
 
-```bash
-server/src/main/assembly/overlay/run-server.bat #[opciones]
-```
+Puedes proporcionar opciones adicionales según sea necesario. Consulta el archivo [EJEMPLOS.md](EJEMPLOS.md) para ver ejemplos de uso.
 
-* **[opciones]**: Puedes proporcionar opciones adicionales según sea necesario. Consulta el archivo [EJEMPLOS.md](EJEMPLOS.md) para ver ejemplos de uso.
-
-### Ejecución del Cliente
+## Ejecución del Cliente
 
 Para ejecutar el cliente, sigue estos pasos:
 
@@ -60,17 +60,24 @@ Para ejecutar el cliente, sigue estos pasos:
 sh client/src/main/assembly/overlay/queryN.sh #[opciones]
 ```
 
-O en windows:
+### **[opciones]**: 
+* **-Daddresses** = Direcciones de los nodos del cluster separadas por punto y coma.
+* **-DinPath** = Path a la carpeta que contiene los archivos CSV de entrada.
+* **-DoutPath** = Path a la carpeta donde se guardarán los archivos de salida queryN.csv y timeN.txt.
+* **-Dcity** = Ciudad de la que se quieren obtener los datos.
+* **-Dn** = Límite para la query 3.
+* **-Dfrom** = Fecha de inicio para la query 4.
+* **-Dto** = Fecha de fin para la query 4.
 
-```bash
-client/src/main/assembly/overlay/queryN.bat #[opciones]
-```
+Puedes proporcionar opciones adicionales según sea necesario. Consulta el archivo [EJEMPLOS.md](EJEMPLOS.md) para ver ejemplos de uso.
 
-* **[opciones]**: Puedes proporcionar opciones adicionales según sea necesario. Consulta el archivo [EJEMPLOS.md](EJEMPLOS.md) para ver ejemplos de uso.
-
-## Ejemplos de Uso
+# Ejemplos de Uso
 
 Para ver ejemplos de uso, consulte el archivo [EJEMPLOS.md](EJEMPLOS.md).
+
+# Management Center
+
+Para instalar y ejecutar el Management Center, consulte el archivo [MANAGEMENT_CENTER.md](MANAGEMENT_CENTER.md).
 
 # Licencia
 
