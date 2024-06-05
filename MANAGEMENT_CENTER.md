@@ -40,7 +40,12 @@ cp path/to/mancenter-3.8.5.war tomcat-webapps/
 --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
 ```
 
-8. Desde la opción Update Cluster URL, ingrese el Cluster Name y Password correspondientes a la GroupConfig del server.
+8. Además agregar el siguiente parámetro al correr el nodo:
+```
+-DmanagementCenter=true
+```
+
+9. Desde la opción Update Cluster URL, ingrese el Cluster Name y Password correspondientes a la GroupConfig del server.
 <p style="text-align: center; margin-top: 10px;">
   <img src="docs/update_cluster_url.png" alt="update cluster url">
 </p>

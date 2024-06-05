@@ -14,12 +14,16 @@ public class Server {
 
     public static void main(String[] args) {
         String networkInterface = null;
+        boolean managementCenter = false;
 
-        // Search for network interface
+        // Search for arguments
         for (String arg : args) {
             if (arg.startsWith("-Daddress=")) {
                 networkInterface = arg.substring("-Daddress=".length());
                 break;
+            }
+            if (arg.startsWith("-DmanagementCenter=")) {
+                managementCenter = Boolean.parseBoolean(arg.substring("-DmanagementCenter=".length()));
             }
         }
 
@@ -60,11 +64,13 @@ public class Server {
         // **** End Network config **** //
 
         // Management Center Config
-        ManagementCenterConfig managementCenterConfig = new
-                ManagementCenterConfig()
-                .setUrl(MANAGEMENT_CENTER_URL)
-                .setEnabled(true);
-        config.setManagementCenterConfig(managementCenterConfig);
+        if (managementCenter) {
+            ManagementCenterConfig managementCenterConfig = new
+                    ManagementCenterConfig()
+                    .setUrl(MANAGEMENT_CENTER_URL)
+                    .setEnabled(true);
+            config.setManagementCenterConfig(managementCenterConfig);
+        }
 
         // Start cluster
         Hazelcast.newHazelcastInstance(config);

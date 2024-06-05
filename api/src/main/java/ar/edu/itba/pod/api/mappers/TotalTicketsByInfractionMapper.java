@@ -12,15 +12,17 @@ import com.hazelcast.mapreduce.Mapper;
 @SuppressWarnings("deprecation")
 public class TotalTicketsByInfractionMapper implements Mapper<Integer, Ticket, String, Integer>, HazelcastInstanceAware {
     private transient HazelcastInstance hazelcastInstance;
-    private IMap<String, Infraction> infractions;
     @Override
     public void map(Integer integer, Ticket ticket, Context<String, Integer> context) {
-        context.emit(infractions.get(ticket.getInfractionCode()).getDefinition(), 1);
+        IMap<String, Infraction> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
+        String definition = infractions.get(ticket.getInfractionCode()).getDefinition();
+        if (definition != null) {
+            context.emit(definition, 1);
+        }
     }
 
     @Override
     public void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         this.hazelcastInstance = hazelcastInstance;
-        this.infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
     }
 }
