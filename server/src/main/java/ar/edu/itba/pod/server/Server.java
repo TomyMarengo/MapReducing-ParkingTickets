@@ -8,11 +8,14 @@ import java.util.Collections;
 
 public class Server {
     private static Logger logger = LoggerFactory.getLogger(Server.class);
+    private static final String GROUP_NAME = "g2";
+    private static final String GROUP_PASSWORD = "g2-pass";
+    private static final String MANAGEMENT_CENTER_URL = "http://localhost:8080/mancenter-3.8.5/";
 
     public static void main(String[] args) {
         String networkInterface = null;
 
-        // Busca el parámetro -Daddress en los argumentos
+        // Search for network interface
         for (String arg : args) {
             if (arg.startsWith("-Daddress=")) {
                 networkInterface = arg.substring("-Daddress=".length());
@@ -20,13 +23,11 @@ public class Server {
             }
         }
 
-        // Verifica si se proporcionó la interfaz de red
+        // Verifies if the network interface was provided
         if (networkInterface == null) {
             logger.error("No network interface provided. Use -Daddress=\"...\"");
             throw new IllegalArgumentException("No network interface provided");
         }
-
-        System.out.println(networkInterface);
 
         logger.info("Network interface: {}", networkInterface);
         logger.info("Setting up server");
@@ -35,7 +36,7 @@ public class Server {
         Config config = new Config();
 
         // Group config
-        GroupConfig groupConfig = new GroupConfig().setName("g2").setPassword("g2-pass");
+        GroupConfig groupConfig = new GroupConfig().setName(GROUP_NAME).setPassword(GROUP_PASSWORD);
         config.setGroupConfig(groupConfig);
 
         // **** Network config **** //
@@ -58,13 +59,13 @@ public class Server {
 
         // **** End Network config **** //
 
-        /*// Management Center Config
+        // Management Center Config
         ManagementCenterConfig managementCenterConfig = new
                 ManagementCenterConfig()
-                .setUrl("http://localhost:32768/mancenter/")
+                .setUrl(MANAGEMENT_CENTER_URL)
                 .setEnabled(true);
         config.setManagementCenterConfig(managementCenterConfig);
-*/
+
         // Start cluster
         Hazelcast.newHazelcastInstance(config);
     }
