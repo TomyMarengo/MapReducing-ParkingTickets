@@ -89,6 +89,13 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
             throw new RuntimeException("Failed to load CSV mapping configuration for city: " + arguments.getCity(), e);
         }
 
+        //        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+        //            reader.lines().skip(1).parallel().forEach(line -> {
+        //                consumer.accept(line.split(";"), config, id++);
+        //            });
+
+        //TODO: Check if parallel is better
+        //TODO: Check if we don't need id and save tickets and infractions in a list
         int id = 0;
         try (CsvFileIterator fileIterator = new CsvFileIterator(filename)) {
             while (fileIterator.hasNext()) {
