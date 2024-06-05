@@ -17,8 +17,8 @@ sh server/src/main/assembly/overlay/run-server.sh -Daddress="192.168.1.*"
 2. Crea una carpeta resources en el directorio de trabajo del proyecto. Y una carpeta out dentro de esta.
 
 ```bash
-mkdir resources
-mkdir resources/out
+mkdir -p resources
+mkdir -p resources/out
 ```
 
 En la carpeta resources deberias tener dos datasets de las ciudades que quieras utilizar, y un archivo json con el orden de las columnas de los archivos de tickets.
