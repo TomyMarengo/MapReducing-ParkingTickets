@@ -1,20 +1,13 @@
 package ar.edu.itba.pod.client.utils;
 
-import ar.edu.itba.pod.api.models.Infraction;
-import ar.edu.itba.pod.api.models.Ticket;
 import ar.edu.itba.pod.client.exceptions.ClientFileException;
 import ar.edu.itba.pod.client.exceptions.ClientIllegalArgumentException;
-import com.hazelcast.core.IList;
-import com.hazelcast.core.IMap;
+import ar.edu.itba.pod.api.interfaces.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.function.BiConsumer;
 
 public class CsvFileIterator implements Iterator<String[]>, Closeable {
     private final BufferedReader reader;
@@ -76,7 +69,7 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
     }
 
     //TODO: read with threads
-    public static void readCsv(Arguments arguments, CsvFileType fileType, BiConsumer<String[], CsvMappingConfig> consumer) {
+    public static void readCsv(Arguments arguments, CsvFileType fileType, TriConsumer<String[], CsvMappingConfig, Integer> consumer) {
         CsvMappingConfig config;
         String filename;
 
@@ -96,9 +89,10 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
             throw new RuntimeException("Failed to load CSV mapping configuration for city: " + arguments.getCity(), e);
         }
 
+        int id = 0;
         try (CsvFileIterator fileIterator = new CsvFileIterator(filename)) {
             while (fileIterator.hasNext()) {
-                consumer.accept(fileIterator.next(), config);
+                consumer.accept(fileIterator.next(), config, id++);
             }
         }
     }

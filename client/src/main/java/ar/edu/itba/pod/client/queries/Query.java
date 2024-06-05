@@ -1,6 +1,6 @@
 package ar.edu.itba.pod.client.queries;
 
-import ar.edu.itba.pod.api.models.CsvWritable;
+import ar.edu.itba.pod.api.interfaces.CsvWritable;
 import ar.edu.itba.pod.client.Client;
 import ar.edu.itba.pod.client.utils.Arguments;
 import ar.edu.itba.pod.client.utils.Constants;

@@ -1,6 +1,6 @@
 package ar.edu.itba.pod.client.utils;
 
-import ar.edu.itba.pod.api.models.CsvWritable;
+import ar.edu.itba.pod.api.interfaces.CsvWritable;
 import ar.edu.itba.pod.client.exceptions.ClientFileException;
 
 import java.io.BufferedWriter;

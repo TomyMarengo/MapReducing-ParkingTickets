@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.api.models;
+package ar.edu.itba.pod.api.interfaces;
 
 public interface CsvWritable {
     String toCsv();
