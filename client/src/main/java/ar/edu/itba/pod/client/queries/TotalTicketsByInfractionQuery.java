@@ -15,12 +15,14 @@ import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 import com.hazelcast.core.ICompletableFuture;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @SuppressWarnings("deprecation")
 public class TotalTicketsByInfractionQuery extends Query {
     private static final String HEADER = "Infraction,Total Tickets";
 
+    //TODO: in queries we should only define the consumers
     @Override
     protected void loadData() {
         IMap<String, Infraction> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
@@ -38,18 +40,19 @@ public class TotalTicketsByInfractionQuery extends Query {
         });
 
         // Parse tickets CSV and count infractions
-        CsvFileIterator.readCsv(arguments, CsvFileType.TICKETS, (fields, config, id) -> {
+        CsvFileIterator.readCsvParallel(arguments, CsvFileType.TICKETS, (fields, config, id) -> {
             if (fields.length >= Ticket.FIELD_COUNT) {
                 try {
+                    //TODO: really we don't need to parse all the fields, we only want the infractionCode in this query. Need another DTO. Ticket is just too much
                     String plate = fields[config.getColumnIndex("plate")];
-                    Date issueDate = Constants.infractionsDateFormat.parse(fields[config.getColumnIndex("issueDate")]); //TODO: change dateFormat to match the one in the CSV (NYC or CHI)
+                    Date issueDate = DateFormats.parseDate(fields[config.getColumnIndex("issueDate")]);
                     String infractionCode = fields[config.getColumnIndex("infractionCode")];
                     Double fineAmount = Double.parseDouble(fields[config.getColumnIndex("fineAmount")]);
                     String countyName = fields[config.getColumnIndex("countyName")];
                     String issuingAgency = fields[config.getColumnIndex("issuingAgency")];
 
                     Ticket ticket = new Ticket(plate, issueDate, infractionCode, fineAmount, countyName, issuingAgency);
-                    tickets.put(id, ticket);
+                    tickets.putIfAbsent(id, ticket);
                 } catch (Exception e) {
                     logger.error("Error processing ticket data", e);
                 }
@@ -63,6 +66,8 @@ public class TotalTicketsByInfractionQuery extends Query {
     protected void executeJob() {
         IMap<Integer, Ticket> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_INFRACTION_MAP.getName());
         IMap<String, Infraction> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
+
+        System.out.println(tickets.size()); //TODO: remove, only for debugging parallel reading
 
         JobTracker jobTracker = hazelcastInstance.getJobTracker(Constants.QUERY_1_JOB_TRACKER_NAME);
         KeyValueSource<Integer, Ticket> source = KeyValueSource.fromMap(tickets);

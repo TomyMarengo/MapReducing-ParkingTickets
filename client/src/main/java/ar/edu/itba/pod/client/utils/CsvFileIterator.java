@@ -3,16 +3,15 @@ package ar.edu.itba.pod.client.utils;
 import ar.edu.itba.pod.client.exceptions.ClientFileException;
 import ar.edu.itba.pod.client.exceptions.ClientIllegalArgumentException;
 import ar.edu.itba.pod.api.interfaces.TriConsumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Iterator;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CsvFileIterator implements Iterator<String[]>, Closeable {
     private final BufferedReader reader;
     private String currentLine;
-    private static final Logger logger = LoggerFactory.getLogger(CsvFileIterator.class);
 
     public CsvFileIterator(String filename) {
         if (filename == null) {
@@ -68,34 +67,34 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
         }
     }
 
-    //TODO: read with threads
-    public static void readCsv(Arguments arguments, CsvFileType fileType, TriConsumer<String[], CsvMappingConfig, Integer> consumer) {
+    private static FilenameAndConfig getFilenameAndConfig(Arguments arguments, CsvFileType fileType) {
         CsvMappingConfig config;
         String filename;
 
         try {
-            filename = switch (fileType) {
+            switch (fileType) {
                 case TICKETS -> {
                     config = CsvMappingConfigFactory.getTicketConfig(arguments.getInPath(), arguments.getCity());
-                    yield arguments.getInPath() + "/tickets" + arguments.getCity() + ".csv";
+                    filename = arguments.getInPath() + "/tickets" + arguments.getCity() + ".csv";
                 }
                 case INFRACTIONS -> {
                     config = CsvMappingConfigFactory.getInfractionConfig(arguments.getInPath(), arguments.getCity());
-                    yield arguments.getInPath() + "/infractions" + arguments.getCity() + ".csv";
+                    filename = arguments.getInPath() + "/infractions" + arguments.getCity() + ".csv";
                 }
                 default -> throw new IllegalArgumentException("Unsupported CSV file type");
-            };
+            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to load CSV mapping configuration for city: " + arguments.getCity(), e);
         }
 
-        //        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-        //            reader.lines().skip(1).parallel().forEach(line -> {
-        //                consumer.accept(line.split(";"), config, id++);
-        //            });
+        return new FilenameAndConfig(filename, config);
+    }
 
-        //TODO: Check if parallel is better
-        //TODO: Check if we don't need id and save tickets and infractions in a list
+    public static void readCsv(Arguments arguments, CsvFileType fileType, TriConsumer<String[], CsvMappingConfig, Integer> consumer) {
+        FilenameAndConfig filenameAndConfig = getFilenameAndConfig(arguments, fileType);
+        String filename = filenameAndConfig.filename();
+        CsvMappingConfig config = filenameAndConfig.config();
+
         int id = 0;
         try (CsvFileIterator fileIterator = new CsvFileIterator(filename)) {
             while (fileIterator.hasNext()) {
@@ -103,4 +102,76 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
             }
         }
     }
+
+    //TODO: Check if passing the consumer to threads improves something and is observable the improvement
+    public static void readCsvParallel(Arguments arguments, CsvFileType fileType, TriConsumer<String[], CsvMappingConfig, Integer> consumer) {
+        FilenameAndConfig filenameAndConfig = getFilenameAndConfig(arguments, fileType);
+        String filename = filenameAndConfig.filename();
+        CsvMappingConfig config = filenameAndConfig.config();
+
+        BlockingQueue<String[]> queue = new LinkedBlockingQueue<>(100);
+        int numProcessors = Runtime.getRuntime().availableProcessors();
+        ExecutorService executorService = Executors.newFixedThreadPool(numProcessors);
+
+        // Start CSV processors
+        for (int i = 0; i < numProcessors; i++) {
+            executorService.submit(new CsvProcessor(queue, consumer, config));
+        }
+
+        try (CsvFileIterator fileIterator = new CsvFileIterator(filename)) {
+            while (fileIterator.hasNext()) {
+                try {
+                    queue.put(fileIterator.next());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    executorService.shutdownNow();
+                    throw new RuntimeException("Interrupted while reading CSV file", e);
+                }
+            }
+        }
+
+        // Indicate end of processing
+        for (int i = 0; i < numProcessors; i++) {
+            try {
+                queue.put(new String[]{});
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                executorService.shutdownNow();
+                throw new RuntimeException("Interrupted while signaling end of CSV processing", e);
+            }
+        }
+
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+                System.err.println("Executor did not terminate in the specified time.");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while awaiting termination of executor service", e);
+        }
+    }
+
+    private record FilenameAndConfig(String filename, CsvMappingConfig config) {}
+
+    private record CsvProcessor(BlockingQueue<String[]> queue,
+                                TriConsumer<String[], CsvMappingConfig, Integer> consumer,
+                                CsvMappingConfig config) implements Runnable {
+        private static final AtomicInteger idGenerator = new AtomicInteger(0);
+
+        @Override
+            public void run() {
+                try {
+                    while (true) {
+                        String[] fields = queue.take();
+                        if (fields.length == 0) { // End signal
+                            break;
+                        }
+                        consumer.accept(fields, config, idGenerator.getAndIncrement());
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
 }
