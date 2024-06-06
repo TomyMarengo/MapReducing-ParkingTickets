@@ -15,7 +15,6 @@ import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 import com.hazelcast.core.ICompletableFuture;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @SuppressWarnings("deprecation")

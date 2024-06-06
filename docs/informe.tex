@@ -67,5 +67,19 @@
 		\item Para todos los puntos anteriores, no olvidar de indicar el tamaño de los archivos utilizados como entrada para las pruebas (cantidad de registros).
 	\end{itemize}
 	
+	\section{Anotaciones}
+	
+	\begin{itemize}
+		\item \textbf{Hablar del parallel read.}
+		
+		Reading a single file at multiple positions concurrently wouldn't let you go any faster (but it could slow you down considerably).
+		
+		Instead of reading the file from multiple threads, read the file from a single thread, and parallelize the processing of these lines. A singe thread should read your CSV line-by-line, and put each line in a queue. Multiple working threads should then take the next line from the queue, parse it, convert to a request, and process the request concurrently as needed. The splitting of the work would then be done by a single thread, ensuring that there are no missing lines or overlaps. 
+		
+		\item \textbf{Hablar del .json que recibe las columnas del CSV}
+		
+		\item \textbf{Hablar del DateFormats que recibe todos los tipos de formatos de fecha con los que se trabaja}
+	\end{itemize}
+	
 	
 \end{document}

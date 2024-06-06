@@ -5,13 +5,13 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.DataSerializable;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 public class Infraction implements DataSerializable {
     public static final Integer FIELD_COUNT = 2;
     private String code;
     private String definition;
 
+    // No-arg constructor for deserialization
     public Infraction() {
     }
 

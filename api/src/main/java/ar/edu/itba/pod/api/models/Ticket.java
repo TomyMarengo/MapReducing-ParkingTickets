@@ -16,6 +16,7 @@ public class Ticket implements DataSerializable {
     private String countyName;
     private String issuingAgency;
 
+    // No-arg constructor for deserialization
     public Ticket() {
     }
 

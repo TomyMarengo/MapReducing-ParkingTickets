@@ -2,6 +2,9 @@ package ar.edu.itba.pod.client.utils;
 
 import java.io.*;
 
+
+// This class is used to copy a specified number of lines from a CSV file to another CSV file.
+// Just for testing purposes.
 public class CsvFileCopier {
     public static void main(String[] args) {
         String sourceFilePath = "./ticketsCHI.csv";
