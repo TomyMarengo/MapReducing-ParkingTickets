@@ -44,15 +44,7 @@ public class Infraction implements DataSerializable {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getDefinition() {
         return definition;
-    }
-
-    public void setDefinition(String definition) {
-        this.definition = definition;
     }
 }

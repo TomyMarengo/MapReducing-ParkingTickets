@@ -72,10 +72,14 @@ public abstract class Query {
 
     protected void loadData() {
         // Parse infractions CSV
-        CsvFileIterator.readCsv(arguments, CsvFileType.INFRACTIONS, infractionsConsumer());
+        if (infractionsConsumer() != null) {
+            CsvFileIterator.readCsv(arguments, CsvFileType.INFRACTIONS, infractionsConsumer());
+        }
 
         // Parse tickets CSV and count infractions
-        CsvFileIterator.readCsvParallel(arguments, CsvFileType.TICKETS, ticketsConsumer());
+        if (ticketsConsumer() != null) {
+            CsvFileIterator.readCsvParallel(arguments, CsvFileType.TICKETS, ticketsConsumer());
+        }
     }
 
     protected abstract TriConsumer<String[], CsvMappingConfig, Integer> infractionsConsumer();

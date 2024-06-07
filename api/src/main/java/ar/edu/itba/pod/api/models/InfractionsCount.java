@@ -16,18 +16,9 @@ public class InfractionsCount implements Comparable<InfractionsCount> {
         return infractionDescription;
     }
 
-    public void setInfractionDescription(String infractionDescription) {
-        this.infractionDescription = infractionDescription;
-    }
-
     public int getCount() {
         return count;
     }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
 
     @Override
     public int compareTo(InfractionsCount other) {

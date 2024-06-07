@@ -26,16 +26,8 @@ public class CountyAndInfractionDto implements DataSerializable {
         return county;
     }
 
-    public void setCounty(String county) {
-        this.county = county;
-    }
-
     public String getInfractionDescription() {
         return infractionDescription;
-    }
-
-    public void setInfractionDescription(String infractionDescription) {
-        this.infractionDescription = infractionDescription;
     }
 
     @Override

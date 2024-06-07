@@ -65,47 +65,23 @@ public class Ticket implements DataSerializable {
         return plate;
     }
 
-    public void setPlate(String plate) {
-        this.plate = plate;
-    }
-
     public Date getIssueDate() {
         return issueDate;
-    }
-
-    public void setIssueDate(Date issueDate) {
-        this.issueDate = issueDate;
     }
 
     public String getInfractionCode() {
         return infractionCode;
     }
 
-    public void setInfractionCode(String infractionCode) {
-        this.infractionCode = infractionCode;
-    }
-
     public Double getFineAmount() {
         return fineAmount;
-    }
-
-    public void setFineAmount(Double fineAmount) {
-        this.fineAmount = fineAmount;
     }
 
     public String getCountyName() {
         return countyName;
     }
 
-    public void setCountyName(String countyName) {
-        this.countyName = countyName;
-    }
-
     public String getIssuingAgency() {
         return issuingAgency;
-    }
-
-    public void setIssuingAgency(String issuingAgency) {
-        this.issuingAgency = issuingAgency;
     }
 }
