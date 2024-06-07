@@ -1,27 +1,28 @@
 package ar.edu.itba.pod.client.queries;
 
 import ar.edu.itba.pod.api.HazelcastCollections;
-import ar.edu.itba.pod.api.combiners.TotalTicketsByInfractionCombinerFactory;
-import ar.edu.itba.pod.api.mappers.TotalTicketsByInfractionMapper;
-import ar.edu.itba.pod.api.models.Ticket;
-import ar.edu.itba.pod.api.models.Infraction;
-import ar.edu.itba.pod.api.models.TicketByInfraction;
-import ar.edu.itba.pod.api.reducers.TotalTicketsByInfractionReducerFactory;
-import ar.edu.itba.pod.api.collators.TotalTicketsByInfractionCollator;
-import ar.edu.itba.pod.client.utils.*;
+import ar.edu.itba.pod.api.collators.TopNInfractionsByCountyCollator;
+import ar.edu.itba.pod.api.combiners.TopNInfractionsByCountyCombinerFactory;
+import ar.edu.itba.pod.api.mappers.TopNInfractionsByCountyMapper;
+import ar.edu.itba.pod.api.models.*;
+import ar.edu.itba.pod.api.reducers.TopNInfractionsByCountyReducerFactory;
+import ar.edu.itba.pod.client.utils.Constants;
+import ar.edu.itba.pod.client.utils.CsvFileIterator;
+import ar.edu.itba.pod.client.utils.CsvFileType;
+import ar.edu.itba.pod.client.utils.DateFormats;
+import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.core.IMap;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
-import com.hazelcast.core.ICompletableFuture;
 
 import java.util.*;
 
 @SuppressWarnings("deprecation")
-public class TotalTicketsByInfractionQuery extends Query {
-    private static final String HEADER = "Infraction,Total Tickets";
+public class TopNInfractionsByCountyQuery extends Query {
+    private static final int top = 3;
+    private static final String HEADER = "County,InfractionTop1,InfractionTop2,InfractionTop3";
 
-    //TODO: in queries we should only define the consumers
     @Override
     protected void loadData() {
         IMap<String, Infraction> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
@@ -38,7 +39,6 @@ public class TotalTicketsByInfractionQuery extends Query {
             }
         });
 
-        // Parse tickets CSV and count infractions
         CsvFileIterator.readCsvParallel(arguments, CsvFileType.TICKETS, (fields, config, id) -> {
             if (fields.length >= Ticket.FIELD_COUNT) {
                 try {
@@ -66,25 +66,35 @@ public class TotalTicketsByInfractionQuery extends Query {
         IMap<Integer, Ticket> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_INFRACTION_MAP.getName());
         IMap<String, Infraction> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
 
-        System.out.println(tickets.size()); //TODO: remove, only for debugging parallel reading
-
-        JobTracker jobTracker = hazelcastInstance.getJobTracker(Constants.QUERY_1_JOB_TRACKER_NAME);
+        JobTracker jobTracker = hazelcastInstance.getJobTracker(Constants.QUERY_2_JOB_TRACKER_NAME);
         KeyValueSource<Integer, Ticket> source = KeyValueSource.fromMap(tickets);
         Job<Integer, Ticket> job = jobTracker.newJob(source);
 
-        final ICompletableFuture<TreeSet<TicketByInfraction>> future = job
-                .mapper(new TotalTicketsByInfractionMapper())
-                .combiner(new TotalTicketsByInfractionCombinerFactory())
-                .reducer(new TotalTicketsByInfractionReducerFactory())
-                .submit(new TotalTicketsByInfractionCollator());
+        final ICompletableFuture<TopNSet<String, InfractionsCount>> future = job
+                .mapper(new TopNInfractionsByCountyMapper())
+                .combiner(new TopNInfractionsByCountyCombinerFactory())
+                .reducer(new TopNInfractionsByCountyReducerFactory())
+                .submit(new TopNInfractionsByCountyCollator(arguments.getN()));
 
         try {
-            TreeSet<TicketByInfraction> result = future.get();
-            writeData(HEADER, result);
+            TopNSet<String, InfractionsCount> result = future.get();
+            //todo: refactor?
+            Set<TopNInfractionsByCounty> topNInfractionsByCounty = new TreeSet<>();
+            for(Map.Entry<String, NavigableSet<InfractionsCount>> entry : result){
+                String county = entry.getKey();
+                NavigableSet<InfractionsCount> infractionsCount = entry.getValue();
+                List<String> topInfractions = new ArrayList<>();
+                for(InfractionsCount infractionCount : infractionsCount){
+                    topInfractions.add(infractionCount.getInfractionDescription());
+                }
+                topNInfractionsByCounty.add(new TopNInfractionsByCounty(county, topInfractions, arguments.getN()));
+            }
+            writeData(HEADER, topNInfractionsByCounty);
             tickets.clear();
             infractions.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 }

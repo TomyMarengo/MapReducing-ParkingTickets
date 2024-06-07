@@ -1,6 +1,7 @@
 package ar.edu.itba.pod.client;
 
 import ar.edu.itba.pod.client.queries.Query;
+import ar.edu.itba.pod.client.queries.TopNInfractionsByCountyQuery;
 import ar.edu.itba.pod.client.queries.TotalTicketsByInfractionQuery;
 import ar.edu.itba.pod.client.utils.Arguments;
 import ar.edu.itba.pod.client.utils.ArgumentParser;
@@ -8,6 +9,7 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.config.GroupConfig;
+import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,9 @@ public class Client {
         switch (arguments.getQuery()) {
             case 1:
                 query = new TotalTicketsByInfractionQuery();
+                break;
+            case 2:
+                query = new TopNInfractionsByCountyQuery();
                 break;
             default:
                 logger.error("Unknown query: " + arguments.getQuery());

@@ -7,18 +7,18 @@ import com.hazelcast.nio.serialization.DataSerializable;
 
 import java.io.IOException;
 
-public class TicketByInfractionDto implements Comparable<TicketByInfractionDto>, DataSerializable, CsvWritable {
-    private String infractionCode;
+public class TicketByInfraction implements Comparable<TicketByInfraction>, CsvWritable {
+    private String infractionCode; //infractionDescription
     private int count;
 
     // No-arg constructor for deserialization
-    public TicketByInfractionDto() {}
+    public TicketByInfraction() {}
 
-    public TicketByInfractionDto(String infractionCode, int count) {
+    public TicketByInfraction(String infractionCode, int count) {
         this.infractionCode = infractionCode;
         this.count = count;
     }
-
+/*
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeUTF(infractionCode);
@@ -31,6 +31,8 @@ public class TicketByInfractionDto implements Comparable<TicketByInfractionDto>,
         count = in.readInt();
     }
 
+ */
+
     public String getInfractionCode() {
         return infractionCode;
     }
@@ -40,7 +42,7 @@ public class TicketByInfractionDto implements Comparable<TicketByInfractionDto>,
     }
 
     @Override
-    public int compareTo(TicketByInfractionDto other) {
+    public int compareTo(TicketByInfraction other) {
         int countComparison = Integer.compare(other.count, this.count);
         return countComparison != 0 ? countComparison : this.infractionCode.compareTo(other.infractionCode);
     }
