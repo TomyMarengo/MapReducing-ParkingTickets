@@ -2,6 +2,7 @@ package ar.edu.itba.pod.client.queries;
 
 import ar.edu.itba.pod.api.HazelcastCollections;
 import ar.edu.itba.pod.api.combiners.TotalTicketsByInfractionCombinerFactory;
+import ar.edu.itba.pod.api.interfaces.TriConsumer;
 import ar.edu.itba.pod.api.mappers.TotalTicketsByInfractionMapper;
 import ar.edu.itba.pod.api.models.Ticket;
 import ar.edu.itba.pod.api.models.Infraction;
@@ -23,12 +24,9 @@ public class TotalTicketsByInfractionQuery extends Query {
 
     //TODO: in queries we should only define the consumers
     @Override
-    protected void loadData() {
+    protected TriConsumer<String[], CsvMappingConfig, Integer> infractionsConsumer() {
         IMap<String, Infraction> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
-        IMap<Integer, Ticket> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_INFRACTION_MAP.getName());
-
-        // Parse infractions CSV
-        CsvFileIterator.readCsv(arguments, CsvFileType.INFRACTIONS, (fields, config, id) -> {
+        return (fields, config, id) -> {
             if (fields.length == Infraction.FIELD_COUNT) {
                 String code = fields[config.getColumnIndex("code")];
                 String definition = fields[config.getColumnIndex("definition")];
@@ -36,10 +34,14 @@ public class TotalTicketsByInfractionQuery extends Query {
             } else {
                 logger.error(String.format("Invalid line format, expected %d fields, found %d", Infraction.FIELD_COUNT, fields.length));
             }
-        });
+        };
+    }
 
-        // Parse tickets CSV and count infractions
-        CsvFileIterator.readCsvParallel(arguments, CsvFileType.TICKETS, (fields, config, id) -> {
+    @Override
+    protected TriConsumer<String[], CsvMappingConfig, Integer> ticketsConsumer() {
+        IMap<Integer, Ticket> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_INFRACTION_MAP.getName());
+
+        return (fields, config, id) -> {
             if (fields.length >= Ticket.FIELD_COUNT) {
                 try {
                     //TODO: really we don't need to parse all the fields, we only want the infractionCode in this query. Need another DTO. Ticket is just too much
@@ -58,7 +60,7 @@ public class TotalTicketsByInfractionQuery extends Query {
             } else {
                 logger.error(String.format("Invalid line format, expected %d fields, found %d", Ticket.FIELD_COUNT, fields.length));
             }
-        });
+        };
     }
 
     @Override

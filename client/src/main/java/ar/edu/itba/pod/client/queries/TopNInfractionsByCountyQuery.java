@@ -3,13 +3,11 @@ package ar.edu.itba.pod.client.queries;
 import ar.edu.itba.pod.api.HazelcastCollections;
 import ar.edu.itba.pod.api.collators.TopNInfractionsByCountyCollator;
 import ar.edu.itba.pod.api.combiners.TopNInfractionsByCountyCombinerFactory;
+import ar.edu.itba.pod.api.interfaces.TriConsumer;
 import ar.edu.itba.pod.api.mappers.TopNInfractionsByCountyMapper;
 import ar.edu.itba.pod.api.models.*;
 import ar.edu.itba.pod.api.reducers.TopNInfractionsByCountyReducerFactory;
-import ar.edu.itba.pod.client.utils.Constants;
-import ar.edu.itba.pod.client.utils.CsvFileIterator;
-import ar.edu.itba.pod.client.utils.CsvFileType;
-import ar.edu.itba.pod.client.utils.DateFormats;
+import ar.edu.itba.pod.client.utils.*;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.core.IMap;
 import com.hazelcast.mapreduce.Job;
@@ -20,16 +18,12 @@ import java.util.*;
 
 @SuppressWarnings("deprecation")
 public class TopNInfractionsByCountyQuery extends Query {
-    private static final int top = 3;
-    private static final String HEADER = "County,InfractionTop1,InfractionTop2,InfractionTop3";
 
     @Override
-    protected void loadData() {
+    protected TriConsumer<String[], CsvMappingConfig, Integer> infractionsConsumer() {
         IMap<String, Infraction> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
-        IMap<Integer, Ticket> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_INFRACTION_MAP.getName());
 
-        // Parse infractions CSV
-        CsvFileIterator.readCsv(arguments, CsvFileType.INFRACTIONS, (fields, config, id) -> {
+        return (fields, config, id) -> {
             if (fields.length == Infraction.FIELD_COUNT) {
                 String code = fields[config.getColumnIndex("code")];
                 String definition = fields[config.getColumnIndex("definition")];
@@ -37,9 +31,14 @@ public class TopNInfractionsByCountyQuery extends Query {
             } else {
                 logger.error(String.format("Invalid line format, expected %d fields, found %d", Infraction.FIELD_COUNT, fields.length));
             }
-        });
+        };
+    }
 
-        CsvFileIterator.readCsvParallel(arguments, CsvFileType.TICKETS, (fields, config, id) -> {
+    @Override
+    protected TriConsumer<String[], CsvMappingConfig, Integer> ticketsConsumer() {
+        IMap<Integer, Ticket> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_INFRACTION_MAP.getName());
+
+        return (fields, config, id) -> {
             if (fields.length >= Ticket.FIELD_COUNT) {
                 try {
                     //TODO: really we don't need to parse all the fields, we only want the infractionCode in this query. Need another DTO. Ticket is just too much
@@ -58,7 +57,7 @@ public class TopNInfractionsByCountyQuery extends Query {
             } else {
                 logger.error(String.format("Invalid line format, expected %d fields, found %d", Ticket.FIELD_COUNT, fields.length));
             }
-        });
+        };
     }
 
     @Override
@@ -89,6 +88,12 @@ public class TopNInfractionsByCountyQuery extends Query {
                 }
                 topNInfractionsByCounty.add(new TopNInfractionsByCounty(county, topInfractions, arguments.getN()));
             }
+            StringBuilder buildHeader = new StringBuilder("County");
+            for (int i = 1; i <= arguments.getN(); i++) {
+                buildHeader.append(",Infraction ").append(i);
+            }
+            String HEADER = buildHeader.toString();
+
             writeData(HEADER, topNInfractionsByCounty);
             tickets.clear();
             infractions.clear();

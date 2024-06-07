@@ -1,10 +1,9 @@
 package ar.edu.itba.pod.client.queries;
 
 import ar.edu.itba.pod.api.interfaces.CsvWritable;
+import ar.edu.itba.pod.api.interfaces.TriConsumer;
 import ar.edu.itba.pod.client.Client;
-import ar.edu.itba.pod.client.utils.Arguments;
-import ar.edu.itba.pod.client.utils.Constants;
-import ar.edu.itba.pod.client.utils.CsvWriter;
+import ar.edu.itba.pod.client.utils.*;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +70,17 @@ public abstract class Query {
         }
     }
 
-    protected abstract void loadData();
+    protected void loadData() {
+        // Parse infractions CSV
+        CsvFileIterator.readCsv(arguments, CsvFileType.INFRACTIONS, infractionsConsumer());
+
+        // Parse tickets CSV and count infractions
+        CsvFileIterator.readCsvParallel(arguments, CsvFileType.TICKETS, ticketsConsumer());
+    }
+
+    protected abstract TriConsumer<String[], CsvMappingConfig, Integer> infractionsConsumer();
+
+    protected abstract TriConsumer<String[], CsvMappingConfig, Integer> ticketsConsumer();
 
     protected abstract void executeJob();
 }
