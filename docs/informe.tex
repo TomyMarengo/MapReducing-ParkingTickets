@@ -69,6 +69,23 @@
 	
 	\section{Anotaciones}
 	
+	\section{Cuestiones matemáticas}
+	
+	\begin{itemize}
+		\item Elección de la key del mapa inicial: en un caso ideal tendríamos bastantes nodos y quisieramos que se distribuya de una forma equitativa para no sobrecargar a ningún nodo. Para esto hay que entender COMPLETAMENTE la naturaleza de nuestro dataset.
+		
+		Ejemplos:
+		
+		Query 2: top 3 infracciones por barrio.
+		
+		Si yo decido elegir como key el barrio, cada barrio irá a un nodo, es decir, no existirán dos nodos tales que contengan infracciones del mismo barrio. Entonces me tengo que preguntar varias cosas. Lo mejor es saber de antemano las posibles respuestas a mis preguntas, si fuesen ciudades de buenos aires quizás entendamos más. Pero bueno, las preguntas podrían ser, existe algun barrio que tenga gran porcentaje de las infracciones de transito? Si fuese así, entonces la key no debería ser unicamente barrio, ya que habría un nodo sobrecargado.
+		
+		\textbf{SEGUIR CON MAS EJEMPLOS}
+		
+		
+		
+	\end{itemize}
+	
 	\begin{itemize}
 		\item \textbf{Hablar del parallel read.}
 		
@@ -79,6 +96,10 @@
 		\item \textbf{Hablar del .json que recibe las columnas del CSV}
 		
 		\item \textbf{Hablar del DateFormats que recibe todos los tipos de formatos de fecha con los que se trabaja}
+		
+		\item Query 2: Desempate por descripcion de la infraccion. Si en un barrio existen dos infracciones que tengan la misma cantidad de multas. El TP no dice nada asi que elegimos desempatar asi. 
+		
+		\item Hablar del TopNSet y de la generalización de la query2. Igualmente el ``3'' está wrappeado en el .sh para respetar la consigna, pero se podría elegir cualquier N como en la query 2.
 	\end{itemize}
 	
 	
