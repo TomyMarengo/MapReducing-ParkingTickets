@@ -1,13 +1,13 @@
 package ar.edu.itba.pod.api.combiners;
 
-import ar.edu.itba.pod.api.models.dtos.CountyAndInfractionDto;
+import ar.edu.itba.pod.api.models.dtos.CountyInfractionDto;
 import com.hazelcast.mapreduce.Combiner;
 import com.hazelcast.mapreduce.CombinerFactory;
 @SuppressWarnings("deprecation")
-public class TopNInfractionsByCountyCombinerFactory implements CombinerFactory<CountyAndInfractionDto, Integer, Integer> {
+public class TopNInfractionsByCountyCombinerFactory implements CombinerFactory<CountyInfractionDto, Integer, Integer> {
 
     @Override
-    public Combiner<Integer, Integer> newCombiner(CountyAndInfractionDto countyAndInfractionDto) {
+    public Combiner<Integer, Integer> newCombiner(CountyInfractionDto countyInfractionDto) {
         return new Top3InfractionsByCountyCombiner();
     }
 

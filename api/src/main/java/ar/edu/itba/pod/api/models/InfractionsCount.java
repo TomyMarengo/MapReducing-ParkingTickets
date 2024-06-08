@@ -29,7 +29,6 @@ public class InfractionsCount implements Comparable<InfractionsCount> {
         return compare;
     }
 
-
     @Override
     public String toString() {
         return "InfractionsCount{" +

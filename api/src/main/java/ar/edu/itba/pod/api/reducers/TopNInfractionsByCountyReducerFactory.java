@@ -1,14 +1,14 @@
 package ar.edu.itba.pod.api.reducers;
 
-import ar.edu.itba.pod.api.models.dtos.CountyAndInfractionDto;
+import ar.edu.itba.pod.api.models.dtos.CountyInfractionDto;
 import com.hazelcast.mapreduce.Reducer;
 import com.hazelcast.mapreduce.ReducerFactory;
 
 @SuppressWarnings("deprecation")
-public class TopNInfractionsByCountyReducerFactory implements ReducerFactory<CountyAndInfractionDto, Integer, Integer> {
+public class TopNInfractionsByCountyReducerFactory implements ReducerFactory<CountyInfractionDto, Integer, Integer> {
 
     @Override
-    public Reducer<Integer, Integer> newReducer(CountyAndInfractionDto key) {
+    public Reducer<Integer, Integer> newReducer(CountyInfractionDto key) {
         return new Top3InfractionsByCountyReducer();
     }
 

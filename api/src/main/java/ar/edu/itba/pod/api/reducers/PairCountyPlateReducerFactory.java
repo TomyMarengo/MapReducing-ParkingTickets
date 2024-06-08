@@ -1,15 +1,15 @@
 package ar.edu.itba.pod.api.reducers;
 
-import ar.edu.itba.pod.api.models.dtos.InfractionPlateDto;
+import ar.edu.itba.pod.api.models.dtos.PlateCountyDto;
 import com.hazelcast.mapreduce.Reducer;
 import com.hazelcast.mapreduce.ReducerFactory;
 
 
 @SuppressWarnings("deprecation")
-public class MostInfractionsCountyPlateReducerFactory implements ReducerFactory<InfractionPlateDto, Integer, Integer> {
+public class PairCountyPlateReducerFactory implements ReducerFactory<PlateCountyDto, Integer, Integer> {
 
     @Override
-    public Reducer<Integer, Integer> newReducer(InfractionPlateDto key) {
+    public Reducer<Integer, Integer> newReducer(PlateCountyDto key) {
         return new MostInfractionsCountryPlateReducer();
     }
 

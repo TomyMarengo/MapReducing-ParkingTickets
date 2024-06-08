@@ -2,7 +2,7 @@ package ar.edu.itba.pod.api.models;
 
 import ar.edu.itba.pod.api.interfaces.CsvWritable;
 
-public class TicketByInfraction implements Comparable<TicketByInfraction>, CsvWritable {
+public class TicketByInfraction implements CsvWritable, Comparable<TicketByInfraction> {
     private String infractionDefinition;
     private int count;
 

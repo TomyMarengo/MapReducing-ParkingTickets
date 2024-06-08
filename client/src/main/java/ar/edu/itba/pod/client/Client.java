@@ -1,6 +1,6 @@
 package ar.edu.itba.pod.client;
 
-import ar.edu.itba.pod.client.queries.MostInfractionsPlatesQuery;
+import ar.edu.itba.pod.client.queries.WorstCountyPlatesQuery;
 import ar.edu.itba.pod.client.queries.Query;
 import ar.edu.itba.pod.client.queries.TopNCollectorAgenciesQuery;
 import ar.edu.itba.pod.client.queries.TopNInfractionsByCountyQuery;
@@ -11,7 +11,6 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.config.GroupConfig;
-import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,8 @@ public class Client {
                 query = new TopNCollectorAgenciesQuery();
                 break;
             case 4:
-                query = new MostInfractionsPlatesQuery(arguments.getFrom(), arguments.getTo());
+                query = new WorstCountyPlatesQuery();
+                break;
             default:
                 logger.error("Unknown query: " + arguments.getQuery());
                 return;

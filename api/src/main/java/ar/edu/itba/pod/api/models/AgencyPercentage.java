@@ -2,7 +2,10 @@ package ar.edu.itba.pod.api.models;
 
 import ar.edu.itba.pod.api.interfaces.CsvWritable;
 
-public record AgencyPercentage(String issuingAgency, Double percentage) implements Comparable<AgencyPercentage>, CsvWritable {
+public class AgencyPercentage implements CsvWritable, Comparable<AgencyPercentage> {
+
+    private final String issuingAgency;
+    private final Double percentage;
 
     public AgencyPercentage(String issuingAgency, Double percentage) {
         this.issuingAgency = issuingAgency;

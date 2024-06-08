@@ -17,6 +17,7 @@ import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @SuppressWarnings("deprecation")
 public class TopNCollectorAgenciesQuery extends Query{
@@ -31,7 +32,7 @@ public class TopNCollectorAgenciesQuery extends Query{
         IMap<Integer, AgencyFineDto> agencies = hazelcastInstance.getMap(HazelcastCollections.AGENCY_FINE_MAP.getName());
 
         return (fields, config, id) -> {
-            if (fields.length >= Ticket.FIELD_COUNT) {
+            if (fields.length >= Constants.FIELD_COUNT) {
                 try {
                     Double fineAmount = Double.parseDouble(fields[config.getColumnIndex("fineAmount")]);
                     String issuingAgency = fields[config.getColumnIndex("issuingAgency")];
@@ -42,13 +43,13 @@ public class TopNCollectorAgenciesQuery extends Query{
                     logger.error("Error processing ticket data", e);
                 }
             } else {
-                logger.error(String.format("Invalid line format, expected %d fields, found %d", Ticket.FIELD_COUNT, fields.length));
+                logger.error(String.format("Invalid line format, expected %d fields, found %d", Constants.FIELD_COUNT, fields.length));
             }
         };
     }
 
     @Override
-    protected void executeJob() {
+    protected void executeJob() throws ExecutionException, InterruptedException {
         IMap<Integer, AgencyFineDto> agencies = hazelcastInstance.getMap(HazelcastCollections.AGENCY_FINE_MAP.getName());
 
         System.out.println(agencies.size()); //TODO: remove, only for debugging parallel reading
@@ -63,12 +64,8 @@ public class TopNCollectorAgenciesQuery extends Query{
                 .reducer(new TopNCollectorAgenciesReducerFactory())
                 .submit(new TopNCollectorAgenciesCollator(arguments.getN()));
 
-        try {
-            TreeSet<AgencyPercentage> result = future.get();
-            writeData(HEADER, result);
-            agencies.clear();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        TreeSet<AgencyPercentage> result = future.get();
+        writeData(HEADER, result);
+        agencies.clear();
     }
 }

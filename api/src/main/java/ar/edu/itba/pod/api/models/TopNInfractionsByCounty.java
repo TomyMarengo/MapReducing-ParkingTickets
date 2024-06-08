@@ -4,7 +4,17 @@ import ar.edu.itba.pod.api.interfaces.CsvWritable;
 
 import java.util.List;
 
-public record TopNInfractionsByCounty(String county, List<String> infractions, int n) implements CsvWritable, Comparable<TopNInfractionsByCounty> {
+public class TopNInfractionsByCounty implements CsvWritable, Comparable<TopNInfractionsByCounty> {
+    private final String county;
+    private final List<String> infractions;
+    private final int n;
+
+    public TopNInfractionsByCounty(String county, List<String> infractions, int n) {
+        this.county = county;
+        this.infractions = infractions;
+        this.n = n;
+    }
+
     @Override
     public String toCsv() {
         StringBuilder sb = new StringBuilder();

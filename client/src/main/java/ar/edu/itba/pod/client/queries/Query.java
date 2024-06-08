@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 public abstract class Query {
     protected HazelcastInstance hazelcastInstance;
@@ -48,7 +49,13 @@ public abstract class Query {
         String startJobLog = sdf.format(new Date(startJobTime)) + Constants.MAP_REDUCE_START_MESSAGE;
         logAndWrite(startJobLog, timestampLogFilePath);
 
-        executeJob();
+        try { //TODO: Handle errors with our exceptions
+            executeJob();
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         // Log and write the end time of job execution
         long endJobTime = System.currentTimeMillis();
@@ -101,5 +108,5 @@ public abstract class Query {
 
     protected abstract TriConsumer<String[], CsvMappingConfig, Integer> ticketsConsumer();
 
-    protected abstract void executeJob();
+    protected abstract void executeJob() throws ExecutionException, InterruptedException;
 }

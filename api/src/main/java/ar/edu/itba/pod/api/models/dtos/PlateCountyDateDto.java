@@ -8,14 +8,16 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
 
-public class InfractionPlateDto implements DataSerializable {
+public class PlateCountyDateDto implements DataSerializable {
     private String plate;
+    private Date date;
     private String county;
 
-    public InfractionPlateDto() {}
+    public PlateCountyDateDto() {}
 
-    public InfractionPlateDto(String plate, String county) {
+    public PlateCountyDateDto(String plate, Date date, String county) {
         this.plate = plate;
+        this.date = date;
         this.county = county;
     }
 
@@ -23,20 +25,25 @@ public class InfractionPlateDto implements DataSerializable {
         return plate;
     }
 
-
-    public String getCounty() {
+    public String getCounty(){
         return county;
+    }
+
+    public Date getDate() {
+        return date;
     }
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeUTF(plate);
+        out.writeLong(date.getTime());
         out.writeUTF(county);
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         plate = in.readUTF();
+        date = new Date(in.readLong());
         county = in.readUTF();
     }
 
@@ -44,13 +51,14 @@ public class InfractionPlateDto implements DataSerializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        InfractionPlateDto that = (InfractionPlateDto) o;
+        PlateCountyDateDto that = (PlateCountyDateDto) o;
         return Objects.equals(plate, that.plate) &&
+                Objects.equals(date, that.date) &&
                 Objects.equals(county, that.county);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(plate, county);
+        return Objects.hash(plate, date, county);
     }
 }

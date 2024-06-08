@@ -6,13 +6,13 @@ import com.hazelcast.nio.serialization.DataSerializable;
 
 import java.io.IOException;
 
-public class SimpleInfractionDto implements DataSerializable {
+public class InfractionDefinitionDto implements DataSerializable {
     private String definition;
 
-    public SimpleInfractionDto() {
+    public InfractionDefinitionDto() {
     }
 
-    public SimpleInfractionDto(String definition) {
+    public InfractionDefinitionDto(String definition) {
         this.definition = definition;
     }
 
