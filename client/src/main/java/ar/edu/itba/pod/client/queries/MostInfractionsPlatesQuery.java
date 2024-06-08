@@ -5,6 +5,7 @@ import ar.edu.itba.pod.api.collators.MostInfractionsCountyPlateCollator;
 import ar.edu.itba.pod.api.combiners.MostInfractionsCountryPlateCombinerFactory;
 import ar.edu.itba.pod.api.interfaces.TriConsumer;
 import ar.edu.itba.pod.api.mappers.MostInfractionsCountyPlateMapper;
+import ar.edu.itba.pod.api.models.CountyPlateByInfractionCountDto;
 import ar.edu.itba.pod.api.models.Ticket;
 import ar.edu.itba.pod.api.models.TicketByInfraction;
 import ar.edu.itba.pod.api.models.dtos.InfractionPlateDateDto;
@@ -21,13 +22,11 @@ import java.util.TreeSet;
 
 @SuppressWarnings("deprecation")
 public class MostInfractionsPlatesQuery extends Query {
-    public MostInfractionsPlatesQuery(Date from, Date to){
-        this.from = from;
-        this.to = to;
-    }
 
-    private final Date from;
-    private final Date to;
+    private static final String HEADER = "County;Plate;Tickets";
+
+
+
 
     @Override
     protected TriConsumer<String[], CsvMappingConfig, Integer> infractionsConsumer() {
@@ -63,17 +62,16 @@ public class MostInfractionsPlatesQuery extends Query {
         KeyValueSource<Integer, InfractionPlateDateDto> source = KeyValueSource.fromMap(map);
         Job<Integer, InfractionPlateDateDto> job = jobTracker.newJob(source);
 
-        final ICompletableFuture<TreeSet<TicketByInfraction>> future = job
+        final ICompletableFuture<TreeSet<CountyPlateByInfractionCountDto>> future = job
                 .mapper(new MostInfractionsCountyPlateMapper(arguments.getFrom(),arguments.getTo()))
                 .combiner(new MostInfractionsCountryPlateCombinerFactory())
                 .reducer(new MostInfractionsCountyPlateReducerFactory())
                 .submit(new MostInfractionsCountyPlateCollator());
 
         try {
-            TreeSet<TicketByInfraction> result = future.get();
+            TreeSet<CountyPlateByInfractionCountDto> result = future.get();
             writeData(HEADER, result);
-            tickets.clear();
-            infractions.clear();
+            map.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }

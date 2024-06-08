@@ -11,8 +11,8 @@ import java.util.Date;
 public class MostInfractionsCountyPlateMapper implements Mapper<Integer, InfractionPlateDateDto, String, String> {
 
 
-    private final transient Date from;
-    private final transient Date to;
+    private final  Date from;
+    private final  Date to;
 
     public MostInfractionsCountyPlateMapper(final Date from, final Date to)
     {

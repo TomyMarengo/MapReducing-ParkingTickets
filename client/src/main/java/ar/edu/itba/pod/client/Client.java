@@ -52,7 +52,7 @@ public class Client {
                 query = new TopNCollectorAgenciesQuery();
                 break;
             case 4:
-                query = new MostInfractionsPlatesQuery(arguments.getFrom(), arguments.getTo());
+                query = new MostInfractionsPlatesQuery();
                 break;
             default:
                 logger.error("Unknown query: " + arguments.getQuery());
