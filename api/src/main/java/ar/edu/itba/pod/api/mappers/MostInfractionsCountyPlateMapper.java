@@ -8,7 +8,7 @@ import com.hazelcast.mapreduce.Mapper;
 import java.util.Date;
 
 @SuppressWarnings("deprecation")
-public class MostInfractionsCountyPlateMapper implements Mapper<Integer, InfractionPlateDateDto, InfractionPlateDto, Integer> {
+public class MostInfractionsCountyPlateMapper implements Mapper<Integer, InfractionPlateDateDto, String, String> {
 
 
     private final transient Date from;
@@ -21,10 +21,10 @@ public class MostInfractionsCountyPlateMapper implements Mapper<Integer, Infract
     }
 
     @Override
-    public void map(Integer integer, InfractionPlateDateDto infractionPlateDateDto, Context<InfractionPlateDto, Integer> context) {
+    public void map(Integer integer, InfractionPlateDateDto infractionPlateDateDto, Context<String, String> context) {
         if (isDateWithinRange(infractionPlateDateDto.getDate()))
         {
-            context.emit(new InfractionPlateDto(infractionPlateDateDto.getPlate(),infractionPlateDateDto.getCounty()),1);
+            context.emit(infractionPlateDateDto.getCounty(),infractionPlateDateDto.getPlate());
         }
     }
 

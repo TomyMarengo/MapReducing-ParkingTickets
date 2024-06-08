@@ -53,6 +53,7 @@ public class Client {
                 break;
             case 4:
                 query = new MostInfractionsPlatesQuery(arguments.getFrom(), arguments.getTo());
+                break;
             default:
                 logger.error("Unknown query: " + arguments.getQuery());
                 return;

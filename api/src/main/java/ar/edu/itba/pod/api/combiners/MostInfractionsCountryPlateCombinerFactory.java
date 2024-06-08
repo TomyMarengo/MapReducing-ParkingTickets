@@ -4,33 +4,39 @@ import ar.edu.itba.pod.api.models.dtos.InfractionPlateDto;
 import com.hazelcast.mapreduce.Combiner;
 import com.hazelcast.mapreduce.CombinerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 
 
 @SuppressWarnings("deprecation")
-public class MostInfractionsCountryPlateCombinerFactory implements CombinerFactory<InfractionPlateDto, Integer, Integer> {
+public class MostInfractionsCountryPlateCombinerFactory implements CombinerFactory<String, String, Map<String,Integer>> {
 
     @Override
-    public Combiner<Integer, Integer> newCombiner(InfractionPlateDto key) {
-        return new MostInfractionsCountryPlateCombiner();
+    public Combiner<String, Map<String,Integer>> newCombiner(String key) {
+        return new MostInfractionsCountryPlateCombinerFactory.MostInfractionsCountryPlateCombiner();
     }
 
-    private static class MostInfractionsCountryPlateCombiner extends Combiner<Integer, Integer> {
-        private Integer sum = 0;
+    private static class MostInfractionsCountryPlateCombiner extends Combiner<String, Map<String,Integer>> {
+        private  Map<String,Integer> plateCounts = new HashMap<>();
+
 
         @Override
-        public void combine(Integer value) {
-            sum += value;
+        public void combine(String plate) {
+            plateCounts.putIfAbsent(plate,0);
+            plateCounts.merge(plate,1, Integer::sum);
         }
 
         @Override
-        public Integer finalizeChunk() {
-            return sum;
+        public Map<String,Integer> finalizeChunk() {
+            return plateCounts;
         }
 
         @Override
-        public void reset() {
-            sum = 0;
+        public void reset(){
+            plateCounts = new HashMap<>();
         }
+
+
     }
 
 }
