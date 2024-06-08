@@ -1,10 +1,6 @@
 package ar.edu.itba.pod.client;
 
-import ar.edu.itba.pod.client.queries.WorstCountyPlatesQuery;
-import ar.edu.itba.pod.client.queries.Query;
-import ar.edu.itba.pod.client.queries.TopNCollectorAgenciesQuery;
-import ar.edu.itba.pod.client.queries.TopNInfractionsByCountyQuery;
-import ar.edu.itba.pod.client.queries.TotalTicketsByInfractionQuery;
+import ar.edu.itba.pod.client.queries.*;
 import ar.edu.itba.pod.client.utils.Arguments;
 import ar.edu.itba.pod.client.utils.ArgumentParser;
 import com.hazelcast.client.HazelcastClient;
@@ -52,6 +48,9 @@ public class Client {
                 break;
             case 4:
                 query = new WorstCountyPlatesQuery();
+                break;
+            case 5:
+                query = new InfractionPairsQuery();
                 break;
             default:
                 logger.error("Unknown query: " + arguments.getQuery());

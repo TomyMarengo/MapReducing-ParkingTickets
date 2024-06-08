@@ -10,6 +10,7 @@ public class Constants {
     public static final String QUERY_3_JOB_TRACKER_NAME = "topNCollectorAgencies";
     public static final String QUERY_4_JOB_TRACKER_NAME = "worstCountyPlates";
     public static final String QUERY_4_JOB_TRACKER_NAME_2 = "worstCountyPlates2";
+    public static final String QUERY_5_JOB_TRACKER_NAME = "infractionPairs";
     public static final String MAP_REDUCE_START_MESSAGE = " - Inicio del trabajo map/reduce\n";
     public static final String MAP_REDUCE_END_MESSAGE = " - Fin del trabajo map/reduce\n";
     public static final String FILE_READ_START_MESSAGE = " - Inicio de la lectura del archivo\n";

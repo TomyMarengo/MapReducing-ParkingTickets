@@ -6,7 +6,8 @@ public enum HazelcastCollections {
     TICKETS_BY_COUNTY_MAP("ticketsByCounty"),
     AGENCY_FINE_MAP("agencyFine"),
     TICKETS_BY_COUNTY_PLATE_MAP("ticketsByCountyPlate"),
-    PAIR_COUNTY_PLATE_MAP("pairCountyPlate");
+    PAIR_COUNTY_PLATE_MAP("pairCountyPlate"),
+    INFRACTION_FINE_MAP("infractionFine");
 
     private final String name;
 
