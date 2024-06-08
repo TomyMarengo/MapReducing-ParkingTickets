@@ -1,5 +1,6 @@
 package ar.edu.itba.pod.client;
 
+import ar.edu.itba.pod.client.queries.MostInfractionsPlatesQuery;
 import ar.edu.itba.pod.client.queries.Query;
 import ar.edu.itba.pod.client.queries.TopNCollectorAgenciesQuery;
 import ar.edu.itba.pod.client.queries.TopNInfractionsByCountyQuery;
@@ -50,6 +51,8 @@ public class Client {
             case 3:
                 query = new TopNCollectorAgenciesQuery();
                 break;
+            case 4:
+                query = new MostInfractionsPlatesQuery(arguments.getFrom(), arguments.getTo());
             default:
                 logger.error("Unknown query: " + arguments.getQuery());
                 return;
