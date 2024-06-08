@@ -46,19 +46,4 @@ public class FineAmountSumDto implements DataSerializable {
                 ", count=" + count +
                 '}';
     }
-
-    //TODO: delete
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FineAmountSumDto that = (FineAmountSumDto) o;
-        if (!Objects.equals(sum, that.sum)) return false;
-        return Objects.equals(count, that.count);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sum, count);
-    }
 }

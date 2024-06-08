@@ -40,7 +40,7 @@ public class InfractionPair implements CsvWritable, Comparable<InfractionPair> {
     public int compareTo(InfractionPair other) {
         /* Compare by groupedAmount, then by infractionA, then by infractionB */
         if (groupedAmount != other.groupedAmount) {
-            return Integer.compare(groupedAmount, other.groupedAmount);
+            return Integer.compare(other.groupedAmount, groupedAmount);
         }
         if (!infractionA.equals(other.infractionA)) {
             return infractionA.compareTo(other.infractionA);
