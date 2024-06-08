@@ -40,7 +40,7 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
             throw new IllegalStateException("No more lines to read");
         }
 
-        String[] fields = currentLine.split(";");
+        String[] fields = currentLine.split(",");
 
         try {
             currentLine = reader.readLine();

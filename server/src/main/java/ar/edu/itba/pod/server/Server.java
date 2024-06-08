@@ -4,7 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class Server {
     private static Logger logger = LoggerFactory.getLogger(Server.class);
@@ -15,15 +19,19 @@ public class Server {
     public static void main(String[] args) {
         String networkInterface = null;
         boolean managementCenter = false;
+        List<String> memberAddresses = new ArrayList<>();
 
         // Search for arguments
         for (String arg : args) {
             if (arg.startsWith("-Daddress=")) {
                 networkInterface = arg.substring("-Daddress=".length());
-                break;
             }
             if (arg.startsWith("-DmanagementCenter=")) {
                 managementCenter = Boolean.parseBoolean(arg.substring("-DmanagementCenter=".length()));
+            }
+            if (arg.startsWith("-Dmembers=")) {
+                String members = arg.substring("-Dmembers=".length());
+                memberAddresses.addAll(Arrays.asList(members.split(",")));
             }
         }
 
@@ -46,10 +54,18 @@ public class Server {
         // **** Network config **** //
 
         // Multicast config
-        MulticastConfig multicastConfig = new MulticastConfig();
+        MulticastConfig multicastConfig = new MulticastConfig().setEnabled(false);
+
+        // TcpIp config
+        TcpIpConfig tcpIpConfig = new TcpIpConfig().setEnabled(true);
+        for (String member : memberAddresses) {
+            tcpIpConfig.addMember(member);
+        }
 
         // Join config
-        JoinConfig joinConfig = new JoinConfig().setMulticastConfig(multicastConfig);
+        JoinConfig joinConfig = new JoinConfig()
+                .setMulticastConfig(multicastConfig)
+                .setTcpIpConfig(tcpIpConfig);
 
         // Interfaces config
         InterfacesConfig interfacesConfig = new InterfacesConfig()

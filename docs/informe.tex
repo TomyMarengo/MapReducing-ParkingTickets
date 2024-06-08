@@ -104,6 +104,8 @@
 		\item Query 3: hablar sobre lo de BigDecimal.
 		
 		\item Query 4 y cualquiera: llegamos al Collector y nos preguntamos el orden de magnitud de nuestra data según la naturaleza de nuestro dataset. En el caso de la query 4 tenemos los pares (barrio, patente). La cantidad de barrios de NYC son 62. Posiblemente alguna ciudad importante no tenga más de 100. Luego tenemos las patentes, que podrían ser ordenes de cientos de miles o de millones. Por lo que el orden de magnitud es bastante alto y tiene sentido hacer otro map reduce. No así si fuera por ejemplo la query 2, donde tenemos los pares (barrio, tipo de fraccion), donde los dos están cerca de los 100, por tanto \#barrio*tipo\_infraccion = 100 * 100 = 10000, que no justifica distribuir la data para otro procesamiento, sino que se puede realizar de manera rápida en el Collator.
+		
+		\item Query 4: imposible usar como key la fecha y usar keyPredicate, no vale la pena ya que se puede filtrar con el Mapper y no presenta ningún otro beneficio ya que las entidades más fuertes en esta query son county y plate.
 	\end{itemize}
 	
 	

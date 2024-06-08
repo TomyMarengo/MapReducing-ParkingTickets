@@ -25,23 +25,7 @@ public class TotalTicketsByInfractionQuery extends Query {
 
     @Override
     protected TriConsumer<String[], CsvMappingConfig, Integer> ticketsConsumer() {
-        IMap<Integer, InfractionDefinitionDto> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_INFRACTION_MAP.getName());
-        IMap<String, InfractionDto> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
-
-        return (fields, config, id) -> {
-            if (fields.length >= Constants.FIELD_COUNT) {
-                try {
-                    String infractionCode = fields[config.getColumnIndex("infractionCode")];
-                    String infractionDefinition = infractions.get(infractionCode).getDefinition();
-
-                    tickets.putIfAbsent(id, new InfractionDefinitionDto(infractionDefinition));
-                } catch (Exception e) {
-                    logger.error("Error processing ticket data", e);
-                }
-            } else {
-                logger.error(String.format("Invalid line format, expected %d fields, found %d", Constants.FIELD_COUNT, fields.length));
-            }
-        };
+        return null;
     }
 
     @Override
