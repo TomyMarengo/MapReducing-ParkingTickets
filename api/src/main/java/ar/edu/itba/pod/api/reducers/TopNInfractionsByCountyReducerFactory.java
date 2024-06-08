@@ -1,6 +1,6 @@
 package ar.edu.itba.pod.api.reducers;
 
-import ar.edu.itba.pod.api.models.CountyAndInfractionDto;
+import ar.edu.itba.pod.api.models.dtos.CountyAndInfractionDto;
 import com.hazelcast.mapreduce.Reducer;
 import com.hazelcast.mapreduce.ReducerFactory;
 

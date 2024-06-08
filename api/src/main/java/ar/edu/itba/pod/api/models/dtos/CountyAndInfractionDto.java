@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.api.models;
+package ar.edu.itba.pod.api.models.dtos;
 
 
 import com.hazelcast.nio.ObjectDataInput;
@@ -10,15 +10,15 @@ import java.util.Objects;
 
 public class CountyAndInfractionDto implements DataSerializable {
     private String county;
-    private String infractionDescription;
+    private String infractionDefinition;
 
     // Default constructor is required for DataSerializable
     public CountyAndInfractionDto() {
     }
 
-    public CountyAndInfractionDto(String county, String infractionDescription){
+    public CountyAndInfractionDto(String county, String infractionDefinition){
         this.county = county;
-        this.infractionDescription = infractionDescription;
+        this.infractionDefinition = infractionDefinition;
     }
 
     // Getters and setters
@@ -26,33 +26,32 @@ public class CountyAndInfractionDto implements DataSerializable {
         return county;
     }
 
-    public String getInfractionDescription() {
-        return infractionDescription;
+    public String getInfractionDefinition() {
+        return infractionDefinition;
     }
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeUTF(county);
-        out.writeUTF(infractionDescription);
+        out.writeUTF(infractionDefinition);
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         county = in.readUTF();
-        infractionDescription = in.readUTF();
+        infractionDefinition = in.readUTF();
     }
 
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CountyAndInfractionDto)) return false;
-        CountyAndInfractionDto that = (CountyAndInfractionDto) o;
-        return county.equals(that.county) && infractionDescription.equals(that.infractionDescription);
+        if (!(o instanceof CountyAndInfractionDto that)) return false;
+        return county.equals(that.county) && infractionDefinition.equals(that.infractionDefinition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(county, infractionDescription);
+        return Objects.hash(county, infractionDefinition);
     }
 }

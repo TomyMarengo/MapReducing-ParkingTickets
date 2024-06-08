@@ -1,10 +1,13 @@
 package ar.edu.itba.pod.client.queries;
 
+import ar.edu.itba.pod.api.HazelcastCollections;
 import ar.edu.itba.pod.api.interfaces.CsvWritable;
 import ar.edu.itba.pod.api.interfaces.TriConsumer;
+import ar.edu.itba.pod.api.models.dtos.InfractionDto;
 import ar.edu.itba.pod.client.Client;
 import ar.edu.itba.pod.client.utils.*;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.FileWriter;
@@ -82,7 +85,19 @@ public abstract class Query {
         }
     }
 
-    protected abstract TriConsumer<String[], CsvMappingConfig, Integer> infractionsConsumer();
+    // Assuming infractions are always loaded in the same way
+    protected TriConsumer<String[], CsvMappingConfig, Integer> infractionsConsumer() {
+        IMap<String, InfractionDto> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
+        return (fields, config, id) -> {
+            if (fields.length == InfractionDto.FIELD_COUNT) {
+                String code = fields[config.getColumnIndex("code")];
+                String definition = fields[config.getColumnIndex("definition")];
+                infractions.put(code, new InfractionDto(code, definition));
+            } else {
+                logger.error(String.format("Invalid line format, expected %d fields, found %d", InfractionDto.FIELD_COUNT, fields.length));
+            }
+        };
+    }
 
     protected abstract TriConsumer<String[], CsvMappingConfig, Integer> ticketsConsumer();
 

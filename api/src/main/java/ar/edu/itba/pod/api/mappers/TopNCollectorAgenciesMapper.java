@@ -1,6 +1,6 @@
 package ar.edu.itba.pod.api.mappers;
 
-import ar.edu.itba.pod.api.models.AgencyFineDto;
+import ar.edu.itba.pod.api.models.dtos.AgencyFineDto;
 import com.hazelcast.mapreduce.Context;
 import com.hazelcast.mapreduce.Mapper;
 

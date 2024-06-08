@@ -1,6 +1,6 @@
 package ar.edu.itba.pod.api.combiners;
 
-import ar.edu.itba.pod.api.models.CountyAndInfractionDto;
+import ar.edu.itba.pod.api.models.dtos.CountyAndInfractionDto;
 import com.hazelcast.mapreduce.Combiner;
 import com.hazelcast.mapreduce.CombinerFactory;
 @SuppressWarnings("deprecation")

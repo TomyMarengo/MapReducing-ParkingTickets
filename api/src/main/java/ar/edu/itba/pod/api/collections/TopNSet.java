@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.api.models;
+package ar.edu.itba.pod.api.collections;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -25,7 +25,6 @@ public class TopNSet<K extends Comparable<K>,V extends Comparable<V>> implements
             set.add(value);
         }
     }
-
 
     @Override
     public Iterator<Map.Entry<K, NavigableSet<V>>> iterator() {

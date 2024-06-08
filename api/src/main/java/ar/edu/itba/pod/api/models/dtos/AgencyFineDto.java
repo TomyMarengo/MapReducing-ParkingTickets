@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.api.models;
+package ar.edu.itba.pod.api.models.dtos;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;

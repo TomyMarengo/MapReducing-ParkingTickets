@@ -6,6 +6,7 @@ import ar.edu.itba.pod.api.combiners.TopNCollectorAgenciesCombinerFactory;
 import ar.edu.itba.pod.api.interfaces.TriConsumer;
 import ar.edu.itba.pod.api.mappers.TopNCollectorAgenciesMapper;
 import ar.edu.itba.pod.api.models.*;
+import ar.edu.itba.pod.api.models.dtos.AgencyFineDto;
 import ar.edu.itba.pod.api.reducers.TopNCollectorAgenciesReducerFactory;
 import ar.edu.itba.pod.client.utils.Constants;
 import ar.edu.itba.pod.client.utils.CsvMappingConfig;
@@ -49,6 +50,8 @@ public class TopNCollectorAgenciesQuery extends Query{
     @Override
     protected void executeJob() {
         IMap<Integer, AgencyFineDto> agencies = hazelcastInstance.getMap(HazelcastCollections.AGENCY_FINE_MAP.getName());
+
+        System.out.println(agencies.size()); //TODO: remove, only for debugging parallel reading
 
         JobTracker jobTracker = hazelcastInstance.getJobTracker(Constants.QUERY_3_JOB_TRACKER_NAME);
         KeyValueSource<Integer, AgencyFineDto> source = KeyValueSource.fromMap(agencies);

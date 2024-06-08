@@ -1,8 +1,8 @@
 package ar.edu.itba.pod.api.collators;
 
-import ar.edu.itba.pod.api.models.CountyAndInfractionDto;
+import ar.edu.itba.pod.api.models.dtos.CountyAndInfractionDto;
 import ar.edu.itba.pod.api.models.InfractionsCount;
-import ar.edu.itba.pod.api.models.TopNSet;
+import ar.edu.itba.pod.api.collections.TopNSet;
 import com.hazelcast.mapreduce.Collator;
 
 import java.util.Map;
@@ -18,7 +18,7 @@ public class TopNInfractionsByCountyCollator implements Collator<Map.Entry<Count
     public TopNSet<String, InfractionsCount> collate(Iterable<Map.Entry<CountyAndInfractionDto, Integer>> values) {
         TopNSet<String, InfractionsCount> topNSet = new TopNSet<>(n);
         for (Map.Entry<CountyAndInfractionDto, Integer> entry : values) {
-            topNSet.add(entry.getKey().getCounty(), new InfractionsCount(entry.getKey().getInfractionDescription(), entry.getValue()));
+            topNSet.add(entry.getKey().getCounty(), new InfractionsCount(entry.getKey().getInfractionDefinition(), entry.getValue()));
         }
         return topNSet;
     }

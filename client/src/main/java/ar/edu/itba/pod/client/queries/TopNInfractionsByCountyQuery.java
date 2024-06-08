@@ -2,10 +2,13 @@ package ar.edu.itba.pod.client.queries;
 
 import ar.edu.itba.pod.api.HazelcastCollections;
 import ar.edu.itba.pod.api.collators.TopNInfractionsByCountyCollator;
+import ar.edu.itba.pod.api.collections.TopNSet;
 import ar.edu.itba.pod.api.combiners.TopNInfractionsByCountyCombinerFactory;
 import ar.edu.itba.pod.api.interfaces.TriConsumer;
 import ar.edu.itba.pod.api.mappers.TopNInfractionsByCountyMapper;
 import ar.edu.itba.pod.api.models.*;
+import ar.edu.itba.pod.api.models.dtos.CountyAndInfractionDto;
+import ar.edu.itba.pod.api.models.dtos.InfractionDto;
 import ar.edu.itba.pod.api.reducers.TopNInfractionsByCountyReducerFactory;
 import ar.edu.itba.pod.client.utils.*;
 import com.hazelcast.core.ICompletableFuture;
@@ -20,37 +23,18 @@ import java.util.*;
 public class TopNInfractionsByCountyQuery extends Query {
 
     @Override
-    protected TriConsumer<String[], CsvMappingConfig, Integer> infractionsConsumer() {
-        IMap<String, Infraction> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
-
-        return (fields, config, id) -> {
-            if (fields.length == Infraction.FIELD_COUNT) {
-                String code = fields[config.getColumnIndex("code")];
-                String definition = fields[config.getColumnIndex("definition")];
-                infractions.put(code, new Infraction(code, definition));
-            } else {
-                logger.error(String.format("Invalid line format, expected %d fields, found %d", Infraction.FIELD_COUNT, fields.length));
-            }
-        };
-    }
-
-    @Override
     protected TriConsumer<String[], CsvMappingConfig, Integer> ticketsConsumer() {
-        IMap<Integer, Ticket> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_INFRACTION_MAP.getName());
+        IMap<Integer, CountyAndInfractionDto> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_COUNTY_MAP.getName());
+        IMap<String, InfractionDto> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
 
         return (fields, config, id) -> {
             if (fields.length >= Ticket.FIELD_COUNT) {
                 try {
-                    //TODO: really we don't need to parse all the fields, we only want the infractionCode in this query. Need another DTO. Ticket is just too much
-                    String plate = fields[config.getColumnIndex("plate")];
-                    Date issueDate = DateFormats.parseDate(fields[config.getColumnIndex("issueDate")]);
-                    String infractionCode = fields[config.getColumnIndex("infractionCode")];
-                    Double fineAmount = Double.parseDouble(fields[config.getColumnIndex("fineAmount")]);
                     String countyName = fields[config.getColumnIndex("countyName")];
-                    String issuingAgency = fields[config.getColumnIndex("issuingAgency")];
+                    String infractionCode = fields[config.getColumnIndex("infractionCode")];
+                    String infractionDefinition = infractions.get(infractionCode).getDefinition();
 
-                    Ticket ticket = new Ticket(plate, issueDate, infractionCode, fineAmount, countyName, issuingAgency);
-                    tickets.putIfAbsent(id, ticket);
+                    tickets.putIfAbsent(id, new CountyAndInfractionDto(countyName, infractionDefinition));
                 } catch (Exception e) {
                     logger.error("Error processing ticket data", e);
                 }
@@ -62,12 +46,14 @@ public class TopNInfractionsByCountyQuery extends Query {
 
     @Override
     protected void executeJob() {
-        IMap<Integer, Ticket> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_INFRACTION_MAP.getName());
-        IMap<String, Infraction> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
+        IMap<Integer, CountyAndInfractionDto> tickets = hazelcastInstance.getMap(HazelcastCollections.TICKETS_BY_COUNTY_MAP.getName());
+        IMap<String, InfractionDto> infractions = hazelcastInstance.getMap(HazelcastCollections.INFRACTIONS_MAP.getName());
+
+        System.out.println(tickets.size()); //TODO: remove, only for debugging parallel reading
 
         JobTracker jobTracker = hazelcastInstance.getJobTracker(Constants.QUERY_2_JOB_TRACKER_NAME);
-        KeyValueSource<Integer, Ticket> source = KeyValueSource.fromMap(tickets);
-        Job<Integer, Ticket> job = jobTracker.newJob(source);
+        KeyValueSource<Integer, CountyAndInfractionDto> source = KeyValueSource.fromMap(tickets);
+        Job<Integer, CountyAndInfractionDto> job = jobTracker.newJob(source);
 
         final ICompletableFuture<TopNSet<String, InfractionsCount>> future = job
                 .mapper(new TopNInfractionsByCountyMapper())
@@ -84,13 +70,13 @@ public class TopNInfractionsByCountyQuery extends Query {
                 NavigableSet<InfractionsCount> infractionsCount = entry.getValue();
                 List<String> topInfractions = new ArrayList<>();
                 for(InfractionsCount infractionCount : infractionsCount){
-                    topInfractions.add(infractionCount.getInfractionDescription());
+                    topInfractions.add(infractionCount.getInfractionDefinition());
                 }
                 topNInfractionsByCounty.add(new TopNInfractionsByCounty(county, topInfractions, arguments.getN()));
             }
             StringBuilder buildHeader = new StringBuilder("County");
             for (int i = 1; i <= arguments.getN(); i++) {
-                buildHeader.append(",Infraction ").append(i);
+                buildHeader.append(";InfractionTop").append(i);
             }
             String HEADER = buildHeader.toString();
 

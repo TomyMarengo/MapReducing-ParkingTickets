@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.api.models;
+package ar.edu.itba.pod.api.models.dtos;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -6,16 +6,16 @@ import com.hazelcast.nio.serialization.DataSerializable;
 
 import java.io.IOException;
 
-public class Infraction implements DataSerializable {
+public class InfractionDto implements DataSerializable {
     public static final Integer FIELD_COUNT = 2;
     private String code;
     private String definition;
 
     // No-arg constructor for deserialization
-    public Infraction() {
+    public InfractionDto() {
     }
 
-    public Infraction(String code, String definition) {
+    public InfractionDto(String code, String definition) {
         this.code = code;
         this.definition = definition;
     }
