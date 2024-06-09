@@ -18,7 +18,7 @@ public class MostInfractionsCountyPlateCollator implements Collator<Map.Entry<St
     @Override
     public TreeSet<CountyPlateByInfractionCountDto> collate(Iterable<Map.Entry<String, PlateAndQuantity>> iterable) {
         TreeSet<CountyPlateByInfractionCountDto> result = new TreeSet<>();
-        iterable.forEach((mapEntry) -> result.add(new CountyPlateByInfractionCountDto(mapEntry.getKey(),mapEntry.getValue().plate(),mapEntry.getValue().quantity())));
+        iterable.forEach((mapEntry) -> result.add(new CountyPlateByInfractionCountDto(mapEntry.getKey(),mapEntry.getValue().getPlate(),mapEntry.getValue().getQuantity())));
         return result;
     }
 }
