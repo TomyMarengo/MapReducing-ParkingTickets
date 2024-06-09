@@ -3,27 +3,39 @@ package ar.edu.itba.pod.client.utils;
 import ar.edu.itba.pod.client.exceptions.ClientFileException;
 import ar.edu.itba.pod.client.exceptions.ClientIllegalArgumentException;
 import ar.edu.itba.pod.api.interfaces.TriConsumer;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@SuppressWarnings("deprecation")
 public class CsvFileIterator implements Iterator<String[]>, Closeable {
     private final BufferedReader reader;
-    private String currentLine;
-    private final String separator;
+    private final Iterator<CSVRecord> csvRecordIterator;
+    private CSVRecord currentRecord;
 
     public CsvFileIterator(String filename, String separator) {
         if (filename == null) {
             throw new IllegalArgumentException("The filename cannot be null");
         }
-        this.separator = separator;
-
         try {
             reader = new BufferedReader(new FileReader(filename));
-            reader.readLine(); // Skip header
-            currentLine = reader.readLine();
+            // Skip header
+            CSVParser csvParser = CSVFormat.DEFAULT
+                    .withDelimiter(separator.charAt(0))
+                    .withHeader()
+                    .withQuote('"')
+                    .withSkipHeaderRecord(true)
+                    .parse(reader);
+            csvRecordIterator = csvParser.iterator();
+            if (csvRecordIterator.hasNext()) {
+                currentRecord = csvRecordIterator.next();
+            }
         } catch (FileNotFoundException e) {
             throw new ClientIllegalArgumentException("The file " + filename + " was not found", e.getCause());
         } catch (IOException e) {
@@ -33,7 +45,7 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
 
     @Override
     public boolean hasNext() {
-        return currentLine != null;
+        return currentRecord != null;
     }
 
     @Override
@@ -42,12 +54,15 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
             throw new IllegalStateException("No more lines to read");
         }
 
-        String[] fields = currentLine.split(separator);
+        String[] fields = new String[currentRecord.size()];
+        for (int i = 0; i < currentRecord.size(); i++) {
+            fields[i] = currentRecord.get(i);
+        }
 
-        try {
-            currentLine = reader.readLine();
-        } catch (IOException e) {
-            throw new ClientFileException(e.getMessage(), e.getCause());
+        if (csvRecordIterator.hasNext()) {
+            currentRecord = csvRecordIterator.next();
+        } else {
+            currentRecord = null;
         }
 
         return fields;

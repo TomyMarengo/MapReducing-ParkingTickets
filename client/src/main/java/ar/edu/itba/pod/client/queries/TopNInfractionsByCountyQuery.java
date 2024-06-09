@@ -33,7 +33,16 @@ public class TopNInfractionsByCountyQuery extends Query {
                 try {
                     String countyName = fields[config.getColumnIndex("countyName")];
                     String infractionCode = fields[config.getColumnIndex("infractionCode")];
-                    String infractionDefinition = infractions.get(infractionCode).getDefinition();
+                    InfractionDto infractionDto = infractions.get(infractionCode);
+
+                    //TODO: remove this block and get the infraction definition from the dto (because exists)
+                    //TODO: its just to test the complete dataset of CHI
+                    String infractionDefinition;
+                    if (infractionDto != null) {
+                        infractionDefinition = infractionDto.getDefinition();
+                    } else {
+                        infractionDefinition = fields[config.getColumnIndex("infractionDefinition")];
+                    }
 
                     tickets.putIfAbsent(id, new CountyInfractionDto(countyName, infractionDefinition));
                 } catch (Exception e) {

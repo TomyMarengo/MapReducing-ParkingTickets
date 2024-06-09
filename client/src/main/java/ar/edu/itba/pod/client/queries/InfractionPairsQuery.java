@@ -34,7 +34,16 @@ public class InfractionPairsQuery extends Query{
                 try {
                     Double fineAmount = Double.parseDouble(fields[config.getColumnIndex("fineAmount")]);
                     String infractionCode = fields[config.getColumnIndex("infractionCode")];
-                    String infractionDefinition = infractions.get(infractionCode).getDefinition();
+                    InfractionDto infractionDto = infractions.get(infractionCode);
+
+                    //TODO: remove this block and get the infraction definition from the dto (because exists)
+                    //TODO: its just to test the complete dataset of CHI
+                    String infractionDefinition;
+                    if (infractionDto != null) {
+                        infractionDefinition = infractionDto.getDefinition();
+                    } else {
+                        infractionDefinition = fields[config.getColumnIndex("infractionDefinition")];
+                    }
                     infractionFinesMap.putIfAbsent(id, new InfractionFineDto(infractionDefinition, fineAmount));
                 } catch (Exception e) {
                     logger.error("Error processing ticket data", e);
