@@ -14,6 +14,7 @@ public class Arguments {
     private final Integer n;
     private final Date from;
     private final Date to;
+    private String separator = ";";
 
 
     private Arguments(Builder builder) {
@@ -25,6 +26,7 @@ public class Arguments {
         this.n = builder.n;
         this.from = builder.from;
         this.to = builder.to;
+        this.separator = builder.separator;
 
         if (query == null || addresses == null || addresses.length == 0 || inPath == null || outPath == null) {
             throw new ClientIllegalArgumentException("Parameters -Daddresses, -DinPath and -DoutPath must be provided");
@@ -62,6 +64,9 @@ public class Arguments {
     public Date getTo() {
         return to;
     }
+    public String getSeparator() {
+        return separator;
+    }
 
     @Override
     public String toString() {
@@ -86,6 +91,7 @@ public class Arguments {
         private Integer n;
         private Date from;
         private Date to;
+        private String separator = ";";
 
         public Builder query(Integer query) {
             this.query = query;
@@ -124,6 +130,11 @@ public class Arguments {
 
         public Builder to(Date to) {
             this.to = to;
+            return this;
+        }
+
+        public Builder separator(String separator) {
+            this.separator = separator;
             return this;
         }
 

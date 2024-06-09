@@ -32,7 +32,8 @@ public class ArgumentParser {
                 } catch (ParseException e) {
                     System.out.println("Error parsing date for -Dto argument: " + e.getMessage());
                 }
-            })
+            }),
+            Map.entry("-Dseparator", (argValue, argBuilder) -> argBuilder.separator(argValue))
     );
 
     private static void invalidArgument(String arg, Arguments.Builder argBuilder) {

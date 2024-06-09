@@ -12,11 +12,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CsvFileIterator implements Iterator<String[]>, Closeable {
     private final BufferedReader reader;
     private String currentLine;
+    private final String separator;
 
-    public CsvFileIterator(String filename) {
+    public CsvFileIterator(String filename, String separator) {
         if (filename == null) {
             throw new IllegalArgumentException("The filename cannot be null");
         }
+        this.separator = separator;
 
         try {
             reader = new BufferedReader(new FileReader(filename));
@@ -40,7 +42,7 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
             throw new IllegalStateException("No more lines to read");
         }
 
-        String[] fields = currentLine.split(";");
+        String[] fields = currentLine.split(separator);
 
         try {
             currentLine = reader.readLine();
@@ -96,7 +98,7 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
         CsvMappingConfig config = filenameAndConfig.config();
 
         int id = 0;
-        try (CsvFileIterator fileIterator = new CsvFileIterator(filename)) {
+        try (CsvFileIterator fileIterator = new CsvFileIterator(filename, arguments.getSeparator())) {
             while (fileIterator.hasNext()) {
                 consumer.accept(fileIterator.next(), config, id++);
             }
@@ -118,7 +120,7 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
             executorService.submit(new CsvProcessor(queue, consumer, config));
         }
 
-        try (CsvFileIterator fileIterator = new CsvFileIterator(filename)) {
+        try (CsvFileIterator fileIterator = new CsvFileIterator(filename,  arguments.getSeparator())) {
             while (fileIterator.hasNext()) {
                 try {
                     queue.put(fileIterator.next());
