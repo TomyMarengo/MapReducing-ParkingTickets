@@ -19,6 +19,7 @@ public class Server {
         String networkInterface = null;
         boolean managementCenter = false;
         List<String> memberAddresses = new ArrayList<>();
+        String publicAddress = null;
 
         // Search for arguments
         for (String arg : args) {
@@ -30,7 +31,10 @@ public class Server {
             }
             if (arg.startsWith("-Dmembers=")) {
                 String members = arg.substring("-Dmembers=".length());
-                memberAddresses.addAll(Arrays.asList(members.split(",")));
+                memberAddresses.addAll(Arrays.asList(members.split(";")));
+            }
+            if (arg.startsWith("-DpublicAddress=")) {
+                publicAddress = arg.substring("-DpublicAddress=".length());
             }
         }
 
@@ -73,6 +77,9 @@ public class Server {
         NetworkConfig networkConfig = new NetworkConfig()
                 .setInterfaces(interfacesConfig)
                 .setJoin(joinConfig);
+        if (publicAddress != null) {
+            networkConfig.setPublicAddress(publicAddress);
+        }
         config.setNetworkConfig(networkConfig);
 
         // **** End Network config **** //
