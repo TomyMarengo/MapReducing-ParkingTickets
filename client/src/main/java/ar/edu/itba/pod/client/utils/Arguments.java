@@ -14,7 +14,7 @@ public class Arguments {
     private final Integer n;
     private final Date from;
     private final Date to;
-    private String separator = ";";
+    private String separator;
 
 
     private Arguments(Builder builder) {
