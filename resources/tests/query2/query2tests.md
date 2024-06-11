@@ -1,3 +1,7 @@
+# What we test
+We are testing the following edge cases:
+
+
 ### Casos de tests para la query 2
 Para NYC probamos los siguientes casos:
 - Un barrio con una sola infracción (Kings)
