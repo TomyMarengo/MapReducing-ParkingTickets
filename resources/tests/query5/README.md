@@ -9,11 +9,11 @@ Probamos los siguientes casos:
 # Comandos para testear query 3
 Comando para testear NYC
 ```bash
-sh client/src/main/assembly/overlay/query3.sh -Daddresses="192.168.0.208:5701" -Dcity=NYC -Dn=3 -DinPath=./resources/tests/query3/NYC -DoutPath=./resources/tests/query3/NYC/out
+sh client/src/main/assembly/overlay/query5.sh -Daddresses="192.168.0.208:5701" -Dcity=NYC  -DinPath=./resources/tests/query5/NYC -DoutPath=./resources/tests/query5/NYC/out
 ```
 Comando para testear CHI
 ```bash
-sh client/src/main/assembly/overlay/query3.sh -Daddresses="192.168.0.208:5701" -Dcity=CHI -Dn=3 -DinPath=./resources/tests/query3/CHI -DoutPath=./resources/tests/query3/CHI/out
+sh client/src/main/assembly/overlay/query5.sh -Daddresses="192.168.0.208:5701" -Dcity=CHI  -DinPath=./resources/tests/query5/CHI -DoutPath=./resources/tests/query5/CHI/out
 ```
 # NYC Salida esperada
 ```csv
