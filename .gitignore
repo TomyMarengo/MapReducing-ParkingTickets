@@ -43,3 +43,8 @@ resources/ticketsNYC.csv
 resources/ticketsNYC.json
 resources/ticketsNYC100.csv
 resources/ticketsCHI100.csv
+/resources/1million_lines_files/
+/resources/5million_lines_files/
+/resources/100k_lines_files/
+/resources/500k_lines_files/
+/resources/complete_files/
