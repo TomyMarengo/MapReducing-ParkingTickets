@@ -66,7 +66,6 @@ public class InfractionPairsQuery extends Query{
 
         final ICompletableFuture<TreeSet<InfractionPair>> future = job
                 .mapper(new InfractionPairMapper())
-                .combiner(new InfractionPairCombinerFactory())
                 .reducer(new InfractionPairReducerFactory())
                 .submit(new InfractionPairCollator());
 

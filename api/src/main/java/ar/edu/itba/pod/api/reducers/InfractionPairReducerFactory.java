@@ -8,20 +8,20 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @SuppressWarnings("deprecation")
-public class InfractionPairReducerFactory implements ReducerFactory<String, FineAmountSumDto, Integer> {
+public class InfractionPairReducerFactory implements ReducerFactory<String, Double, Integer> {
     @Override
-    public Reducer<FineAmountSumDto, Integer> newReducer(String key) {
+    public Reducer<Double, Integer> newReducer(String key) {
         return new InfractionPairReducer();
     }
 
-    private static class InfractionPairReducer extends Reducer<FineAmountSumDto, Integer> {
+    private static class InfractionPairReducer extends Reducer<Double, Integer> {
         private BigDecimal sum = BigDecimal.ZERO;
         private Integer count = 0;
 
         @Override
-        public void reduce(FineAmountSumDto value) {
-            sum = sum.add(value.getSum());
-            count += value.getCount();
+        public void reduce(Double value) {
+            sum = sum.add(BigDecimal.valueOf(value));
+            count ++;
         }
 
         @Override

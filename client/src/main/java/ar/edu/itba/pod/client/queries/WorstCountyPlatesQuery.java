@@ -64,7 +64,6 @@ public class WorstCountyPlatesQuery extends Query {
 
         final ICompletableFuture<Map<PlateCountyDto, Integer>> future = job
                 .mapper(new PairCountyPlateMapper(arguments.getFrom(),arguments.getTo()))
-                .combiner(new PairCountyPlateCombinerFactory())
                 .reducer(new PairCountyPlateReducerFactory())
                 .submit();
 
@@ -78,7 +77,6 @@ public class WorstCountyPlatesQuery extends Query {
 
         final ICompletableFuture<TreeSet<WorstPlates>> future2 = job2
                 .mapper(new WorstCountyPlateMapper())
-                .combiner(new WorstCountyPlateCombinerFactory())
                 .reducer(new WorstCountyPlateReducerFactory())
                 .submit(new WorstCountyPlateCollator());
 

@@ -65,7 +65,6 @@ public class TotalTicketsByInfractionQuery extends Query {
 
         final ICompletableFuture<TreeSet<TicketByInfraction>> future = job
                 .mapper(new TotalTicketsByInfractionMapper())
-                .combiner(new TotalTicketsByInfractionCombinerFactory())
                 .reducer(new TotalTicketsByInfractionReducerFactory())
                 .submit(new TotalTicketsByInfractionCollator());
 

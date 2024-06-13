@@ -60,7 +60,6 @@ public class TopNCollectorAgenciesQuery extends Query{
 
         final ICompletableFuture<TreeSet<AgencyPercentage>> future = job
                 .mapper(new TopNCollectorAgenciesMapper())
-                .combiner(new TopNCollectorAgenciesCombinerFactory())
                 .reducer(new TopNCollectorAgenciesReducerFactory())
                 .submit(new TopNCollectorAgenciesCollator(arguments.getN()));
 

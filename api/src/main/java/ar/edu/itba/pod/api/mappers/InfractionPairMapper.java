@@ -4,8 +4,6 @@ import ar.edu.itba.pod.api.models.dtos.InfractionFineDto;
 import com.hazelcast.mapreduce.Context;
 import com.hazelcast.mapreduce.Mapper;
 
-import java.math.BigDecimal;
-
 @SuppressWarnings("deprecation")
 public class InfractionPairMapper implements Mapper<Integer, InfractionFineDto, String, Double> {
     @Override

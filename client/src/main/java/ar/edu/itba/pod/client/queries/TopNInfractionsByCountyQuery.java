@@ -67,7 +67,6 @@ public class TopNInfractionsByCountyQuery extends Query {
 
         final ICompletableFuture<TopNSet<String, InfractionsCount>> future = job
                 .mapper(new TopNInfractionsByCountyMapper())
-                .combiner(new TopNInfractionsByCountyCombinerFactory())
                 .reducer(new TopNInfractionsByCountyReducerFactory())
                 .submit(new TopNInfractionsByCountyCollator(arguments.getN()));
 
