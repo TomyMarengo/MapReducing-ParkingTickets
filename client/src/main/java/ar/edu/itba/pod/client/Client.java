@@ -41,7 +41,7 @@ public class Client {
                 query = new TotalTicketsByInfractionQuery();
                 break;
             case 2:
-                query = new TopNInfractionsByCountyQuery();
+                query = new TopNInfractionsByCountyQueryAlternative();
                 break;
             case 3:
                 query = new TopNCollectorAgenciesQuery();
