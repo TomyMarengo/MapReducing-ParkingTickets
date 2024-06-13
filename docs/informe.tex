@@ -58,53 +58,104 @@
 	
 	\section{Introducción}
 	
-	\begin{itemize}
-		\item Cómo se diseñaron los componentes de cada trabajo MapReduce, qué decisiones se tomaron y con qué objetivos. Además alguna alternativa de diseño que se evaluó y descartó, comentando el porqué.
-		\item El análisis de los tiempos para la resolución de cada query: En caso de poder, analizar la diferencia de tiempos de correr cada query aumentando la cantidad de nodos (hasta 5 nodos) en una red local. De no poder, intentar predecir cómo sería el comportamiento.
-		\item Potenciales puntos de mejora y/o expansión.
-		\item La comparación de los tiempos de las queries ejecutándose con y sin Combiner.
-		\item Otro análisis de tiempos de ejecución de las queries utilizando algún otro elemento de optimización a elección por el grupo.
-		\item Para todos los puntos anteriores, no olvidar de indicar el tamaño de los archivos utilizados como entrada para las pruebas (cantidad de registros).
-	\end{itemize}
+	En este trabajo, se explora el diseño y la implementación de un sistema distribuido utilizando Hazelcast y el paradigma MapReduce para procesar grandes volúmenes de datos de infracciones de tránsito. El objetivo principal es desarrollar consultas eficientes y escalables, optimizando el rendimiento y evaluando estrategias de procesamiento distribuido. Se tomaron decisiones críticas en la arquitectura del sistema para maximizar la eficiencia y minimizar la latencia, evaluando alternativas de diseño con base en la escalabilidad y robustez.
 	
-	\section{Anotaciones}
+	\bigskip
 	
-	\section{Cuestiones matemáticas}
+	Se analizó el impacto de utilizar combiners y se realizaron pruebas con conjuntos de datos variados, incluyendo distribuciones desbalanceadas para probar cómo ciertas elecciones de clave (key) afectan el balanceo de carga y el rendimiento. Estos experimentos permiten obtener una comprensión más profunda de cómo diferentes factores influyen en la eficiencia del procesamiento distribuido.
 	
-	\begin{itemize}
-		\item Elección de la key del mapa inicial: en un caso ideal tendríamos bastantes nodos y quisieramos que se distribuya de una forma equitativa para no sobrecargar a ningún nodo. Para esto hay que entender COMPLETAMENTE la naturaleza de nuestro dataset.
-		
-		Ejemplos:
-		
-		Query 2: top 3 infracciones por barrio.
-		
-		Si yo decido elegir como key el barrio, cada barrio irá a un nodo, es decir, no existirán dos nodos tales que contengan infracciones del mismo barrio. Entonces me tengo que preguntar varias cosas. Lo mejor es saber de antemano las posibles respuestas a mis preguntas, si fuesen ciudades de buenos aires quizás entendamos más. Pero bueno, las preguntas podrían ser, existe algun barrio que tenga gran porcentaje de las infracciones de transito? Si fuese así, entonces la key no debería ser unicamente barrio, ya que habría un nodo sobrecargado.
-		
-		\textbf{SEGUIR CON MAS EJEMPLOS}
-		
-		
-		
-	\end{itemize}
+
+	\newpage
 	
-	\begin{itemize}
-		\item \textbf{Hablar del parallel read.}
-		
-		Reading a single file at multiple positions concurrently wouldn't let you go any faster (but it could slow you down considerably).
-		
-		Instead of reading the file from multiple threads, read the file from a single thread, and parallelize the processing of these lines. A singe thread should read your CSV line-by-line, and put each line in a queue. Multiple working threads should then take the next line from the queue, parse it, convert to a request, and process the request concurrently as needed. The splitting of the work would then be done by a single thread, ensuring that there are no missing lines or overlaps. 
-		
-		\item \textbf{Hablar del .json que recibe las columnas del CSV}
-		
-		\item \textbf{Hablar del DateFormats que recibe todos los tipos de formatos de fecha con los que se trabaja}
-		
-		\item Query 2: Desempate por descripcion de la infraccion. Si en un barrio existen dos infracciones que tengan la misma cantidad de multas. El TP no dice nada asi que elegimos desempatar asi. 
-		
-		\item Hablar del TopNSet y de la generalización de la query2. Igualmente el ``3'' está wrappeado en el .sh para respetar la consigna, pero se podría elegir cualquier N como en la query 2.
-		
-		\item Query 3: hablar sobre lo de BigDecimal.
-		
-		\item Query 4 y cualquiera: llegamos al Collector y nos preguntamos el orden de magnitud de nuestra data según la naturaleza de nuestro dataset. En el caso de la query 4 tenemos los pares (barrio, patente). La cantidad de barrios de NYC son 62. Posiblemente alguna ciudad importante no tenga más de 100. Luego tenemos las patentes, que podrían ser ordenes de cientos de miles o de millones. Por lo que el orden de magnitud es bastante alto y tiene sentido hacer otro map reduce. No así si fuera por ejemplo la query 2, donde tenemos los pares (barrio, tipo de fraccion), donde los dos están cerca de los 100, por tanto \#barrio*tipo\_infraccion = 100 * 100 = 10000, que no justifica distribuir la data para otro procesamiento, sino que se puede realizar de manera rápida en el Collator.
-	\end{itemize}
+	\section{Diseño de los componentes de cada MapReduce}
+	
+	\subsection{Elección de la Key del Mapa Inicial}
+	
+	En el diseño de un sistema MapReduce, \textbf{la elección de la clave (key) para el mapeo inicial es fundamental para asegurar una distribución equilibrada de la carga entre los nodos}. La clave debe ser seleccionada teniendo en cuenta la naturaleza del dataset para evitar sobrecargar un solo nodo. En un escenario ideal con un número considerable de nodos, la distribución equitativa de los datos es crucial.
+	
+	\bigskip 
+	
+	Como ejemplo, para la consulta de las top 3 infracciones por barrio, inicialmente podríamos pensar en utilizar el barrio como clave. Sin embargo, esta elección puede llevar a una distribución desigual si ciertos barrios concentran un alto porcentaje de las infracciones. Por ejemplo, en un dataset de infracciones de tránsito en una gran estado, algunas ciudades de mayor concentración demográfica o  industrial, pueden tener una mayor densidad de población y, por lo tanto, más infracciones. Si el barrio se utiliza como clave, los nodos que procesan esos barrios podrían sobrecargarse. El tiempo en un proceso en paralelo es el tiempo del que más tarda, por lo que en el peor caso podría ser como no distribuir la data.
+	
+	\bigskip
+	
+	Para evitar este problema, \textbf{se decidió utilizar una clave primaria (PK) autoincremental} como clave para la distribución de los datos. Esto asegura que los tickets se distribuyan aleatoriamente entre los nodos, equilibrando la carga de trabajo. Sin embargo, dependiendo de la naturaleza de la agrupación requerida por la consulta, puede requerir una etapa adicional de procesamiento para agrupar los datos de interés.
+	
+	\subsection{Componentes}
+	
+	Primero se detalla la idea general, que en principio valdría para cualquier consulta, salvo excepciones. En tal caso se nombran en una sección aparte.
+	
+	\bigskip
+	
+	Los \textbf{mappers} toman cada ticket con un ID particular y emiten pares clave-valor en la forma (clave de interés, 1). Cada ticket se sube a la red con la información pertinente para cada consulta. Esto es simplemente para agilizar los testeos y no sobrecargar la red, aunque se entiende que en un ambiente operativo y del día a día estos datos ya están cargados.
+	
+	\bigskip
+	
+	Los \textbf{combiners} realizan una operación similar a la de los reducers pero a nivel local en cada nodo. Agrupan los valores (1s) localmente para reducir la cantidad de datos que necesitan ser transferidos a través de la red en la fase de reducción.
+	
+	\bigskip
+	
+	Los \textbf{reducers} agrupan los valores recibidos de los mappers y combiners, sumando los 1s para cada clave de interés. Este proceso consolida los datos a nivel global.
+	
+	\bigskip
+	
+	Los \textbf{collators} trabajan con un orden de magnitud mucho menor después de la fase de reducción, realizando operaciones finales como el ordenamiento y selección de los top N elementos que son poco costosas dada la magnitud de la información que le llega, pero no es siempre así...
+	
+	\subsubsection{¿Y si el collator trabaja con mucha información?}
+	
+	En el caso de la Query 4, que requiere encontrar las placas de peor comportamiento por barrio, el orden de magnitud de los datos que llegan al collator es considerablemente alto. Los datos están compuestos por pares (barrio, placa), donde la cantidad de barrios es relativamente pequeña pero la cantidad de placas puede ser muy grande.
+	
+	\bigskip
+	En ese caso hay dos opciones: 
+	
+	\begin{enumerate}
+		\item Para manejar este gran volumen de datos, se puede realizar un MapReduce adicional. Si el collator recibiera un dataset con un orden de magnitud muy alto, el procesamiento se volvería ineficiente, por ejemplo un ordenamiento sería muy costoso. Por lo tanto, se optó por dividir el trabajo en dos fases de MapReduce.
+		\item Se puede pensar desde cero el MapReduce, utilizando otra key que no sea el entero incremental, y que permita reducir la magnitud de la información en pasos anteriores como el mapper o el reducer.
+	\end{enumerate}
+	
+	\newpage
+	
+	\section{Cuestiones particulares sobre la implementación}
+	
+	\subsection{Parallel Read}
+	
+	Para abordar eficientemente la lectura de archivos grandes, optamos por un enfoque secuencial con procesamiento concurrente. Esto significa que utilizamos un solo hilo para leer el archivo CSV línea por línea, colocando cada línea en una cola. Luego, múltiples hilos consumen las líneas de esta cola, procesando y filtrando los campos de interés para luego ser almacenados en el IMap de Hazelcast.
+	
+	\bigskip
+	
+	Como resultado directo de esta implementación, logramos reducir significativamente el tiempo de procesamiento de archivos grandes, como por ejemplo, el archivo CSV de NYC con 15 millones de líneas que pasó de más de 1 hora a entre 3 y 4 minutos (que consideramos razonable).
+	
+	\subsection{Multas de cualquier otra ciudad}
+	
+	Para ser lo más permisivos posible al leer archivos CSV de diferentes formatos, diseñamos un sistema configurable que permite al usuario definir la estructura del CSV a través de un archivo JSON y manejar diferentes formatos de fecha.
+	
+	\bigskip
+	
+	El usuario debe subir un archivo JSON que especifica el índice de cada columna de interés entre los campos mencionados en el trabajo práctico. Esto permite una flexibilidad considerable, ya que el sistema puede adaptarse a diferentes estructuras de archivos CSV sin necesidad de modificar el código fuente. El usuario además puede subir archivos que tengan más columnas y el programa se encargará de tomar sólo las de interés.
+	
+	\bigskip
+	
+	Luego, la clase DateFormats permite agregar diferentes tipos de formatos de fecha, facilitando la inclusión de CSV con distintos formatos de fecha. Las fechas suelen variar más que otros campos en los datasets, por lo que esta flexibilidad es esencial.
+	
+	\bigskip
+	
+	Para los demás campos optamos por elegir tipos que engloben a lo que se encuentra usualmente. Por ejemplo, para el monto usamos Double, ya que si es entero o con decimales no estamos perdiendo información.
+	
+	\subsection{TopNSet}
+	
+	TopNSet es una colección que se encarga de mantener siempre N elementos ordenados para cada key. La idea era usarla para la query 2 y 3, pero al final sólo sirvió para la 2. De esta manera dejamos a la segunda consulta como genérica en vez de ``top 3''. Igualmente para respetar la consulta se pasa como parámetro 3 por defecto.
+	
+	\newpage
+	
+	\section{Resultados}
+	
+	En todos estos resultados se utilizó la misma configuración del sistema, salvo que se diga la contrario: 3 nodos, y 5 datasets con diferentes cantidades de líneas: 100k, 500k, 1M, 5M y 15M.
+	
+	\subsection{Tiempo para cada query según cantidad de nodos}
+	
+	\subsection{Con y sin Combiner}
+	
+	\subsection{Dataset aleatorio y desbalanceado}
 	
 	
 \end{document}
