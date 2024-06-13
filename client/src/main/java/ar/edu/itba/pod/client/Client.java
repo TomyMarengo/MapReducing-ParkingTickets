@@ -37,24 +37,15 @@ public class Client {
         // Ejecutar la query según el argumento
         Query query;
         switch (arguments.getQuery()) {
-            case 1:
-                query = new TotalTicketsByInfractionQuery();
-                break;
-            case 2:
-                query = new TopNInfractionsByCountyQuery();
-                break;
-            case 3:
-                query = new TopNCollectorAgenciesQuery();
-                break;
-            case 4:
-                query = new WorstCountyPlatesQuery();
-                break;
-            case 5:
-                query = new InfractionPairsQuery();
-                break;
-            default:
+            case 1 -> query = new TotalTicketsByInfractionQuery();
+            case 2 -> query = new TopNInfractionsByCountyQuery();
+            case 3 -> query = new TopNCollectorAgenciesQuery();
+            case 4 -> query = new WorstCountyPlatesQuery();
+            case 5 -> query = new InfractionPairsQuery();
+            default -> {
                 logger.error("Unknown query: " + arguments.getQuery());
                 return;
+            }
         }
 
         query.execute(hazelcastInstance, arguments);
