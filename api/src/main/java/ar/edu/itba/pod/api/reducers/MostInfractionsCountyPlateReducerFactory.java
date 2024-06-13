@@ -26,7 +26,7 @@ public class MostInfractionsCountyPlateReducerFactory implements ReducerFactory<
         @Override
         public void reduce(Map<String,Integer> counts) {
             counts.forEach((plate,amount) -> {
-                combinedCounts.putIfAbsent(plate,amount);
+                combinedCounts.putIfAbsent(plate,0);
                 combinedCounts.merge(plate,amount,Integer::sum);
             });
         }
