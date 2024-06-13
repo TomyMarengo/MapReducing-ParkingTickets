@@ -52,8 +52,6 @@ public class TopNCollectorAgenciesQuery extends Query{
     protected void executeJob() throws ExecutionException, InterruptedException {
         IMap<Integer, AgencyFineDto> agencies = hazelcastInstance.getMap(HazelcastCollections.AGENCY_FINE_MAP.getName());
 
-        System.out.println(agencies.size()); //TODO: remove, only for debugging parallel reading
-
         JobTracker jobTracker = hazelcastInstance.getJobTracker(Constants.QUERY_3_JOB_TRACKER_NAME);
         KeyValueSource<Integer, AgencyFineDto> source = KeyValueSource.fromMap(agencies);
         Job<Integer, AgencyFineDto> job = jobTracker.newJob(source);

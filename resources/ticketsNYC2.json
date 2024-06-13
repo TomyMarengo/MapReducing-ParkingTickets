@@ -1,8 +1,0 @@
-{
-  "plate": 0,
-  "issueDate": 1,
-  "infractionCode": 2,
-  "fineAmount": 3,
-  "countyName": 4,
-  "issuingAgency": 5
-}

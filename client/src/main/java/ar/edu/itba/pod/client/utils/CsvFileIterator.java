@@ -120,7 +120,6 @@ public class CsvFileIterator implements Iterator<String[]>, Closeable {
         }
     }
 
-    //TODO: Check if passing the consumer to threads improves something and is observable the improvement
     public static void readCsvParallel(Arguments arguments, CsvFileType fileType, TriConsumer<String[], CsvMappingConfig, Integer> consumer) {
         FilenameAndConfig filenameAndConfig = getFilenameAndConfig(arguments, fileType);
         String filename = filenameAndConfig.filename();

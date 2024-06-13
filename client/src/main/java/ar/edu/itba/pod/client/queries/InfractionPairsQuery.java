@@ -35,15 +35,7 @@ public class InfractionPairsQuery extends Query{
                     Double fineAmount = Double.parseDouble(fields[config.getColumnIndex("fineAmount")]);
                     String infractionCode = fields[config.getColumnIndex("infractionCode")];
                     InfractionDto infractionDto = infractions.get(infractionCode);
-
-                    //TODO: remove this block and get the infraction definition from the dto (because exists)
-                    //TODO: its just to test the complete dataset of CHI
-                    String infractionDefinition;
-                    if (infractionDto != null) {
-                        infractionDefinition = infractionDto.getDefinition();
-                    } else {
-                        infractionDefinition = fields[config.getColumnIndex("infractionDefinition")];
-                    }
+                    String infractionDefinition = infractionDto.getDefinition();
                     infractionFinesMap.putIfAbsent(id, new InfractionFineDto(infractionDefinition, fineAmount));
                 } catch (Exception e) {
                     logger.error("Error processing ticket data", e);
@@ -57,8 +49,6 @@ public class InfractionPairsQuery extends Query{
     @Override
     protected void executeJob() throws ExecutionException, InterruptedException {
         IMap<Integer, InfractionFineDto> infractionFinesMap = hazelcastInstance.getMap(HazelcastCollections.INFRACTION_FINE_MAP.getName());
-
-        System.out.println(infractionFinesMap.size()); //TODO: remove, only for debugging parallel reading
 
         JobTracker jobTracker = hazelcastInstance.getJobTracker(Constants.QUERY_5_JOB_TRACKER_NAME);
         KeyValueSource<Integer, InfractionFineDto> source = KeyValueSource.fromMap(infractionFinesMap);
