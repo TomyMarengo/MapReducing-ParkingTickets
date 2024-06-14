@@ -73,7 +73,7 @@ sh client/src/main/assembly/overlay/query1.sh -Daddresses="192.168.1.51:5701;192
 
 Utilizando un nodo y el dataset de NYC:
 ```bash
-sh client/src/main/assembly/overlay/query2.sh -Daddresses="192.168.1.51:5701" -Dcity=NYC -DinPath=./resources -DoutPath=./resources/out
+sh client/src/main/assembly/overlay/query2.sh -Daddresses="192.168.1.51:5701" -Dn=3 -Dcity=NYC -DinPath=./resources -DoutPath=./resources/out
 ```
 
 ### Query 3: Top N agencias con mayor porcentaje de recaudación
