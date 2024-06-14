@@ -4,11 +4,19 @@
 \contentsline {subsection}{\numberline {2.1}Elección de la Key del Mapa Inicial}{3}{}%
 \contentsline {subsection}{\numberline {2.2}Componentes}{3}{}%
 \contentsline {subsubsection}{\numberline {2.2.1}¿Y si el collator trabaja con mucha información?}{4}{}%
-\contentsline {section}{\numberline {3}Cuestiones particulares sobre la implementación}{5}{}%
-\contentsline {subsection}{\numberline {3.1}Parallel Read}{5}{}%
-\contentsline {subsection}{\numberline {3.2}Multas de cualquier otra ciudad}{5}{}%
-\contentsline {subsection}{\numberline {3.3}TopNSet}{5}{}%
-\contentsline {section}{\numberline {4}Resultados}{6}{}%
-\contentsline {subsection}{\numberline {4.1}Tiempo para cada query según cantidad de nodos}{6}{}%
-\contentsline {subsection}{\numberline {4.2}Con y sin Combiner}{6}{}%
-\contentsline {subsection}{\numberline {4.3}Dataset aleatorio y desbalanceado}{6}{}%
+\contentsline {subsubsection}{\numberline {2.2.2}¿KeyPredicate?}{4}{}%
+\contentsline {subsection}{\numberline {2.3}Queries}{4}{}%
+\contentsline {subsubsection}{\numberline {2.3.1}Query 1}{4}{}%
+\contentsline {subsubsection}{\numberline {2.3.2}Query 2}{5}{}%
+\contentsline {subsubsection}{\numberline {2.3.3}Query 3}{5}{}%
+\contentsline {subsubsection}{\numberline {2.3.4}Query 4}{5}{}%
+\contentsline {subsubsection}{\numberline {2.3.5}Query 5}{6}{}%
+\contentsline {section}{\numberline {3}Cuestiones particulares sobre la implementación}{7}{}%
+\contentsline {subsection}{\numberline {3.1}Parallel Read}{7}{}%
+\contentsline {subsection}{\numberline {3.2}Multas de cualquier otra ciudad}{7}{}%
+\contentsline {subsection}{\numberline {3.3}TopNSet}{7}{}%
+\contentsline {section}{\numberline {4}Resultados}{8}{}%
+\contentsline {subsection}{\numberline {4.1}Tiempo para cada query según cantidad de nodos}{8}{}%
+\contentsline {subsection}{\numberline {4.2}Con y sin Combiner}{9}{}%
+\contentsline {subsection}{\numberline {4.3}Otra alternativa a la query 4}{9}{}%
+\contentsline {section}{\numberline {5}Mejoras a futuro}{11}{}%

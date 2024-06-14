@@ -24,12 +24,7 @@ import java.util.TreeSet;
 /* No se usa, es para la query 4 alternativa */
 @SuppressWarnings("deprecation")
 public class AlternativeOptimizedQuery4 extends Query {
-
     private static final String HEADER = "County;Plate;Tickets";
-
-
-
-
     @Override
     protected TriConsumer<String[], CsvMappingConfig, Integer> infractionsConsumer() {
         return null;

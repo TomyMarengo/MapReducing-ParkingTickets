@@ -20,7 +20,6 @@ public class MostInfractionsCountryPlateCombinerFactory implements CombinerFacto
     private static class MostInfractionsCountryPlateCombiner extends Combiner<String, Map<String,Integer>> {
         private  Map<String,Integer> plateCounts = new HashMap<>();
 
-
         @Override
         public void combine(String plate) {
             plateCounts.putIfAbsent(plate,0);
@@ -36,8 +35,6 @@ public class MostInfractionsCountryPlateCombinerFactory implements CombinerFacto
         public void reset(){
             plateCounts = new HashMap<>();
         }
-
-
     }
 
 }

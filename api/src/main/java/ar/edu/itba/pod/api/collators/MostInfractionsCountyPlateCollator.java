@@ -13,9 +13,6 @@ import java.util.TreeSet;
 /* No se usa, solo para query 4 alternativa */
 @SuppressWarnings("deprecation")
 public class MostInfractionsCountyPlateCollator implements Collator<Map.Entry<String, PlateAndQuantity>, TreeSet<CountyPlateByInfractionCountDto>> {
-
-
-
     @Override
     public TreeSet<CountyPlateByInfractionCountDto> collate(Iterable<Map.Entry<String, PlateAndQuantity>> iterable) {
         TreeSet<CountyPlateByInfractionCountDto> result = new TreeSet<>();

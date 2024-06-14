@@ -49,7 +49,7 @@ public abstract class Query {
         String startJobLog = sdf.format(new Date(startJobTime)) + Constants.MAP_REDUCE_START_MESSAGE;
         logAndWrite(startJobLog, timestampLogFilePath);
 
-        try { //TODO: Handle errors with our exceptions
+        try {
             executeJob();
         } catch (ExecutionException e) {
             throw new RuntimeException(e);

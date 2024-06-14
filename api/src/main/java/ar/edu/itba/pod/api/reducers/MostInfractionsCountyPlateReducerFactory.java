@@ -22,8 +22,6 @@ public class MostInfractionsCountyPlateReducerFactory implements ReducerFactory<
     private static class MostInfractionsCountryPlateReducer extends Reducer<Map<String,Integer>, PlateAndQuantity> {
         private final Map<String,Integer> combinedCounts = new HashMap<>();
 
-
-
         @Override
         public void reduce(Map<String,Integer> counts) {
             counts.forEach((plate,amount) -> {
